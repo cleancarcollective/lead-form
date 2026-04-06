@@ -10,41 +10,29 @@ const SHOP_SLUG =
   import.meta.env.VITE_SHOP_SLUG || "christchurch";
 
 const SERVICES = [
-  "Premium Detail",
-  "Deluxe Detail",
-  "Premium Interior",
-  "Deluxe Interior",
-  "Mold Treatment",
-  "Deluxe Exterior Hand Wash",
-  "Premium Exterior",
-  "1-Step Paint Correction",
-  "2-Step Paint Correction",
-  "Ceramic Coating – Bronze",
-  "Ceramic Coating – Silver",
-  "Ceramic Coating – Gold",
-  "Not sure — I'd like a recommendation",
+  "Inside and out package options",
+  "Interior only",
+  "Exterior only",
+  "Ceramic coating",
+  "Paint correction",
+  "Paint protection film",
+  "Other",
 ];
 
 type FormState = {
-  first_name: string;
-  last_name: string;
+  full_name: string;
   email: string;
   phone: string;
-  vehicle_year: string;
-  vehicle_make: string;
-  vehicle_model: string;
+  vehicle: string;
   service_requested: string;
   notes: string;
 };
 
-const EMPTY_FORM: FormState = {
-  first_name: "",
-  last_name: "",
+const EMPTY: FormState = {
+  full_name: "",
   email: "",
   phone: "",
-  vehicle_year: "",
-  vehicle_make: "",
-  vehicle_model: "",
+  vehicle: "",
   service_requested: "",
   notes: "",
 };
@@ -52,11 +40,13 @@ const EMPTY_FORM: FormState = {
 type Status = "idle" | "submitting" | "error";
 
 export default function App() {
-  const [form, setForm] = useState<FormState>(EMPTY_FORM);
+  const [form, setForm] = useState<FormState>(EMPTY);
   const [status, setStatus] = useState<Status>("idle");
   const [errorMessage, setErrorMessage] = useState("");
 
-  function handleChange(e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement | HTMLTextAreaElement>) {
+  function handleChange(
+    e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement | HTMLTextAreaElement>
+  ) {
     setForm((prev) => ({ ...prev, [e.target.name]: e.target.value }));
   }
 
@@ -65,359 +55,275 @@ export default function App() {
     setStatus("submitting");
     setErrorMessage("");
 
+    const nameParts = form.full_name.trim().split(/\s+/);
+    const first_name = nameParts[0] ?? form.full_name;
+    const last_name = nameParts.slice(1).join(" ") || undefined;
+
     try {
       const response = await fetch(CRM_LEAD_URL, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
-          ...form,
+          first_name,
+          last_name,
+          email: form.email,
+          phone: form.phone || undefined,
+          vehicle_make: form.vehicle || undefined,
+          service_requested: form.service_requested || undefined,
+          notes: form.notes || undefined,
           shop_slug: SHOP_SLUG,
           source: "website-lead-form",
         }),
       });
 
-      if (!response.ok) {
-        throw new Error("Submission failed. Please try again.");
-      }
+      if (!response.ok) throw new Error("Submission failed. Please try again.");
 
       window.location.href = THANK_YOU_URL;
     } catch (err) {
       setStatus("error");
-      setErrorMessage(err instanceof Error ? err.message : "Something went wrong. Please try again.");
+      setErrorMessage(
+        err instanceof Error ? err.message : "Something went wrong. Please try again."
+      );
     }
   }
 
   const isSubmitting = status === "submitting";
 
   return (
-    <div style={styles.page}>
-      <div style={styles.card}>
-        {/* Header */}
-        <div style={styles.header}>
-          <p style={styles.headerEyebrow}>Clean Car Collective</p>
-          <h1 style={styles.headerTitle}>Get a Quote</h1>
-          <p style={styles.headerSubtitle}>Fill in your details and we'll get back to you shortly.</p>
-        </div>
+    <div style={s.page}>
+      <div style={s.card}>
+        <h2 style={s.title}>Free Estimate</h2>
 
-        {/* Form */}
-        <form onSubmit={handleSubmit} style={styles.form} noValidate>
+        <form onSubmit={handleSubmit} noValidate style={s.form}>
 
-          {/* Name row */}
-          <div style={styles.row}>
-            <div style={styles.field}>
-              <label style={styles.label} htmlFor="first_name">First name <span style={styles.required}>*</span></label>
-              <input
-                id="first_name"
-                name="first_name"
-                type="text"
-                required
-                autoComplete="given-name"
-                value={form.first_name}
-                onChange={handleChange}
-                placeholder="Jane"
-                style={styles.input}
-              />
-            </div>
-            <div style={styles.field}>
-              <label style={styles.label} htmlFor="last_name">Last name</label>
-              <input
-                id="last_name"
-                name="last_name"
-                type="text"
-                autoComplete="family-name"
-                value={form.last_name}
-                onChange={handleChange}
-                placeholder="Smith"
-                style={styles.input}
-              />
-            </div>
-          </div>
-
-          {/* Contact row */}
-          <div style={styles.row}>
-            <div style={styles.field}>
-              <label style={styles.label} htmlFor="email">Email <span style={styles.required}>*</span></label>
-              <input
-                id="email"
-                name="email"
-                type="email"
-                required
-                autoComplete="email"
-                value={form.email}
-                onChange={handleChange}
-                placeholder="jane@example.com"
-                style={styles.input}
-              />
-            </div>
-            <div style={styles.field}>
-              <label style={styles.label} htmlFor="phone">Phone</label>
-              <input
-                id="phone"
-                name="phone"
-                type="tel"
-                autoComplete="tel"
-                value={form.phone}
-                onChange={handleChange}
-                placeholder="021 000 0000"
-                style={styles.input}
-              />
-            </div>
-          </div>
-
-          {/* Divider */}
-          <div style={styles.divider} />
-
-          {/* Vehicle row */}
-          <div style={styles.row}>
-            <div style={{ ...styles.field, flex: "0 0 90px" }}>
-              <label style={styles.label} htmlFor="vehicle_year">Year</label>
-              <input
-                id="vehicle_year"
-                name="vehicle_year"
-                type="text"
-                inputMode="numeric"
-                maxLength={4}
-                value={form.vehicle_year}
-                onChange={handleChange}
-                placeholder="2019"
-                style={styles.input}
-              />
-            </div>
-            <div style={styles.field}>
-              <label style={styles.label} htmlFor="vehicle_make">Make</label>
-              <input
-                id="vehicle_make"
-                name="vehicle_make"
-                type="text"
-                value={form.vehicle_make}
-                onChange={handleChange}
-                placeholder="Toyota"
-                style={styles.input}
-              />
-            </div>
-            <div style={styles.field}>
-              <label style={styles.label} htmlFor="vehicle_model">Model</label>
-              <input
-                id="vehicle_model"
-                name="vehicle_model"
-                type="text"
-                value={form.vehicle_model}
-                onChange={handleChange}
-                placeholder="RAV4"
-                style={styles.input}
-              />
-            </div>
-          </div>
-
-          {/* Service */}
-          <div style={styles.field}>
-            <label style={styles.label} htmlFor="service_requested">Service interested in</label>
-            <select
-              id="service_requested"
-              name="service_requested"
-              value={form.service_requested}
+          <Field label="First & last name" required>
+            <input
+              name="full_name"
+              type="text"
+              required
+              autoComplete="name"
+              placeholder=""
+              value={form.full_name}
               onChange={handleChange}
-              style={{ ...styles.input, ...styles.select }}
-            >
-              <option value="">Select a service…</option>
-              {SERVICES.map((s) => (
-                <option key={s} value={s}>{s}</option>
-              ))}
-            </select>
-          </div>
+              style={s.input}
+            />
+          </Field>
 
-          {/* Notes */}
-          <div style={styles.field}>
-            <label style={styles.label} htmlFor="notes">Anything else we should know?</label>
+          <Field label="Email" required>
+            <input
+              name="email"
+              type="email"
+              required
+              autoComplete="email"
+              placeholder=""
+              value={form.email}
+              onChange={handleChange}
+              style={s.input}
+            />
+          </Field>
+
+          <Field label="Phone number" required>
+            <input
+              name="phone"
+              type="tel"
+              required
+              autoComplete="tel"
+              placeholder=""
+              value={form.phone}
+              onChange={handleChange}
+              style={s.input}
+            />
+          </Field>
+
+          <div style={s.divider} />
+
+          <Field label="Service Enquiry" required>
+            <div style={s.selectWrap}>
+              <select
+                name="service_requested"
+                required
+                value={form.service_requested}
+                onChange={handleChange}
+                style={s.select}
+              >
+                <option value="">Select one...</option>
+                {SERVICES.map((s) => (
+                  <option key={s} value={s}>{s}</option>
+                ))}
+              </select>
+              <span style={s.chevron}>›</span>
+            </div>
+          </Field>
+
+          <p style={s.hint}>Vehicle (e.g. 2018 Mazda CX-5, 2012 BMW 125i)</p>
+
+          <Field label="Vehicle Year/Make/Model" required>
+            <input
+              name="vehicle"
+              type="text"
+              required
+              placeholder=""
+              value={form.vehicle}
+              onChange={handleChange}
+              style={s.input}
+            />
+          </Field>
+
+          <Field label="Any additional information?">
             <textarea
-              id="notes"
               name="notes"
               rows={3}
               value={form.notes}
               onChange={handleChange}
-              placeholder="Specific concerns, stains, paint issues…"
-              style={{ ...styles.input, ...styles.textarea }}
+              style={{ ...s.input, resize: "vertical", minHeight: "80px", lineHeight: "1.5" }}
             />
-          </div>
+          </Field>
 
-          {/* Error */}
           {status === "error" && (
-            <div style={styles.errorBox}>
-              {errorMessage}
-            </div>
+            <p style={s.error}>{errorMessage}</p>
           )}
 
-          {/* Submit */}
           <button
             type="submit"
             disabled={isSubmitting}
-            style={{ ...styles.button, ...(isSubmitting ? styles.buttonDisabled : {}) }}
+            style={{ ...s.button, ...(isSubmitting ? s.buttonDisabled : {}) }}
           >
-            {isSubmitting ? "Sending…" : "Request a Quote"}
+            {isSubmitting ? "Sending…" : "Get Free Estimate!"}
           </button>
 
         </form>
-
-        {/* Footer */}
-        <div style={styles.footer}>
-          <p style={styles.footerText}>
-            Questions? Call us on{" "}
-            <a href="tel:0800476667" style={styles.footerLink}>0800 476 667</a>
-            {" "}or email{" "}
-            <a href="mailto:hello@cleancarcollective.co.nz" style={styles.footerLink}>hello@cleancarcollective.co.nz</a>
-          </p>
-        </div>
       </div>
     </div>
   );
 }
 
-// ─── Styles ────────────────────────────────────────────────────────────────────
+function Field({
+  label,
+  required,
+  children,
+}: {
+  label: string;
+  required?: boolean;
+  children: React.ReactNode;
+}) {
+  return (
+    <div style={{ display: "flex", flexDirection: "column", gap: "6px" }}>
+      <label style={s.label}>
+        {label}{required && <span style={s.required}> *</span>}
+      </label>
+      {children}
+    </div>
+  );
+}
 
-const styles: Record<string, React.CSSProperties> = {
+const s: Record<string, React.CSSProperties> = {
   page: {
     minHeight: "100vh",
-    backgroundColor: "#f0ebe4",
+    backgroundColor: "#000000",
     display: "flex",
     alignItems: "flex-start",
     justifyContent: "center",
-    padding: "32px 16px 48px",
+    padding: "0",
     fontFamily: "-apple-system, BlinkMacSystemFont, 'Segoe UI', Helvetica, Arial, sans-serif",
     WebkitFontSmoothing: "antialiased",
-    boxSizing: "border-box",
   },
   card: {
     width: "100%",
-    maxWidth: "620px",
     backgroundColor: "#ffffff",
-    borderRadius: "20px",
-    overflow: "hidden",
-    boxShadow: "0 2px 24px rgba(0,0,0,0.08)",
-    border: "1px solid #e8e0d6",
+    padding: "32px 24px 40px",
+    boxSizing: "border-box",
   },
-  header: {
-    background: "linear-gradient(160deg, #1a1713 0%, #0d0c0b 100%)",
-    padding: "32px 36px",
-  },
-  headerEyebrow: {
-    margin: "0 0 6px",
-    fontSize: "11px",
-    letterSpacing: "0.18em",
-    textTransform: "uppercase" as const,
-    color: "#a89e96",
-  },
-  headerTitle: {
-    margin: "0 0 10px",
-    fontSize: "28px",
+  title: {
+    margin: "0 0 24px",
+    fontSize: "26px",
     fontWeight: 700,
-    color: "#ffffff",
-    lineHeight: 1.1,
-  },
-  headerSubtitle: {
-    margin: 0,
-    fontSize: "15px",
-    color: "#7a6f68",
-    lineHeight: 1.5,
+    color: "#0a0a0a",
+    letterSpacing: "-0.01em",
   },
   form: {
-    padding: "32px 36px 28px",
     display: "flex",
-    flexDirection: "column" as const,
+    flexDirection: "column",
     gap: "16px",
   },
-  row: {
-    display: "flex",
-    gap: "12px",
-    flexWrap: "wrap" as const,
-  },
-  field: {
-    display: "flex",
-    flexDirection: "column" as const,
-    flex: 1,
-    minWidth: "140px",
-    gap: "6px",
-  },
   label: {
-    fontSize: "12px",
-    fontWeight: 600,
-    letterSpacing: "0.04em",
-    textTransform: "uppercase" as const,
-    color: "#5c5148",
+    fontSize: "14px",
+    fontWeight: 700,
+    color: "#0a0a0a",
   },
   required: {
-    color: "#c0392b",
+    color: "#0a0a0a",
+    fontWeight: 700,
   },
   input: {
     width: "100%",
-    padding: "11px 14px",
+    padding: "12px 14px",
     fontSize: "15px",
-    color: "#1a1713",
-    backgroundColor: "#faf8f5",
-    border: "1px solid #ddd5c8",
-    borderRadius: "10px",
+    color: "#0a0a0a",
+    backgroundColor: "#ffffff",
+    border: "1.5px solid #d0d0d0",
+    borderRadius: "6px",
     outline: "none",
-    boxSizing: "border-box" as const,
+    boxSizing: "border-box",
     fontFamily: "inherit",
-    transition: "border-color 0.15s",
+  },
+  selectWrap: {
+    position: "relative",
+    display: "flex",
+    alignItems: "center",
   },
   select: {
-    appearance: "none" as const,
-    backgroundImage: `url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='8' viewBox='0 0 12 8'%3E%3Cpath fill='%239e9189' d='M6 8L0 0h12z'/%3E%3C/svg%3E")`,
-    backgroundRepeat: "no-repeat",
-    backgroundPosition: "right 14px center",
-    paddingRight: "36px",
+    width: "100%",
+    padding: "12px 14px",
+    fontSize: "15px",
+    color: "#0a0a0a",
+    backgroundColor: "#ffffff",
+    border: "1.5px solid #d0d0d0",
+    borderRadius: "6px",
+    outline: "none",
+    boxSizing: "border-box",
+    fontFamily: "inherit",
+    appearance: "none",
     cursor: "pointer",
+    paddingRight: "36px",
   },
-  textarea: {
-    resize: "vertical" as const,
-    minHeight: "88px",
-    lineHeight: 1.6,
+  chevron: {
+    position: "absolute",
+    right: "14px",
+    fontSize: "18px",
+    color: "#666",
+    pointerEvents: "none",
+    transform: "rotate(90deg)",
+    lineHeight: 1,
   },
   divider: {
-    borderTop: "1px solid #ede6dc",
+    borderTop: "1.5px solid #0a0a0a",
     margin: "4px 0",
   },
-  errorBox: {
-    padding: "12px 16px",
-    backgroundColor: "#fdf2f2",
-    border: "1px solid #f5c6c6",
-    borderRadius: "10px",
+  hint: {
+    margin: "-4px 0 -4px",
+    fontSize: "13px",
+    color: "#666666",
+  },
+  error: {
+    margin: 0,
     fontSize: "14px",
     color: "#c0392b",
-    lineHeight: 1.5,
   },
   button: {
-    width: "100%",
-    padding: "15px 24px",
-    fontSize: "16px",
+    width: "fit-content",
+    padding: "13px 24px",
+    fontSize: "15px",
     fontWeight: 700,
     color: "#ffffff",
-    backgroundColor: "#1a1713",
+    backgroundColor: "#0a0a0a",
     border: "none",
-    borderRadius: "12px",
+    borderRadius: "6px",
     cursor: "pointer",
-    letterSpacing: "0.02em",
-    marginTop: "4px",
     fontFamily: "inherit",
-    transition: "opacity 0.15s",
+    marginTop: "4px",
   },
   buttonDisabled: {
-    opacity: 0.6,
+    opacity: 0.5,
     cursor: "not-allowed",
-  },
-  footer: {
-    padding: "18px 36px 24px",
-    borderTop: "1px solid #ede6dc",
-  },
-  footerText: {
-    margin: 0,
-    fontSize: "13px",
-    color: "#9e9189",
-    lineHeight: 1.6,
-  },
-  footerLink: {
-    color: "#5c5148",
-    fontWeight: 600,
-    textDecoration: "none",
   },
 };
