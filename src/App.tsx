@@ -4,7 +4,7 @@ const CRM_LEAD_URL =
   import.meta.env.VITE_CRM_LEAD_URL || "https://crm-tawny-nine-13.vercel.app/api/leads/intake";
 
 const THANK_YOU_URL =
-  import.meta.env.VITE_THANK_YOU_URL || "https://cleancarcollective.co.nz/thank-you";
+  import.meta.env.VITE_THANK_YOU_URL || "https://cleancarcollective.co.nz/christchurch-quote-confirmed/";
 
 const SHOP_SLUG =
   import.meta.env.VITE_SHOP_SLUG || "christchurch";
