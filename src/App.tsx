@@ -78,6 +78,15 @@ export default function App() {
 
       if (!response.ok) throw new Error("Submission failed. Please try again.");
 
+      try {
+        if (window.top && window.top !== window.self) {
+          window.top.location.href = THANK_YOU_URL;
+          return;
+        }
+      } catch {
+        // Fall back to same-frame navigation if the embed context blocks top access.
+      }
+
       window.location.href = THANK_YOU_URL;
     } catch (err) {
       setStatus("error");
