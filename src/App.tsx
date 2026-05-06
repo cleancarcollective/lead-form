@@ -16,7 +16,8 @@ const CRM_LEAD_URL =
   "https://crm.cleancarcollective.co.nz/api/leads/intake";
 
 // Per-shop thank-you destinations. Add new rows here when a shop comes online.
-// VITE_THANK_YOU_URL still wins if set — handy for one-off staging deploys.
+// VITE_THANK_YOU_URL is only used when the shop isn't in this map (one-off
+// staging / new shop you haven't added to code yet).
 const THANK_YOU_URLS: Record<string, string> = {
   christchurch:
     "https://cleancarcollective.co.nz/christchurch-quote-confirmed/",
@@ -25,8 +26,8 @@ const THANK_YOU_URLS: Record<string, string> = {
 };
 
 const THANK_YOU_URL =
-  import.meta.env.VITE_THANK_YOU_URL ||
   THANK_YOU_URLS[SHOP_SLUG] ||
+  import.meta.env.VITE_THANK_YOU_URL ||
   THANK_YOU_URLS.christchurch;
 
 const SERVICES = [
