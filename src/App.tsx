@@ -22,7 +22,7 @@ const THANK_YOU_URLS: Record<string, string> = {
   christchurch:
     "https://cleancarcollective.co.nz/christchurch-quote-confirmed/",
   wellington:
-    "https://cleancarcollective.co.nz/wellington-quote-confirmed/",
+    "https://cleancarcollective.co.nz/get-a-detailing-quote-in-wellington/",
 };
 
 const THANK_YOU_URL =
