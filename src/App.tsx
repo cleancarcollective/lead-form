@@ -1,13 +1,33 @@
 import { useState } from "react";
 
-const CRM_LEAD_URL =
-  import.meta.env.VITE_CRM_LEAD_URL || "https://crm-tawny-nine-13.vercel.app/api/leads/intake";
-
-const THANK_YOU_URL =
-  import.meta.env.VITE_THANK_YOU_URL || "https://cleancarcollective.co.nz/christchurch-quote-confirmed/";
+// Read ?shop=wellington from the iframe URL, falling back to env / default.
+// Single deployment serves every shop — embed pages set the param on the
+// iframe src.
+const urlParams =
+  typeof window !== "undefined"
+    ? new URLSearchParams(window.location.search)
+    : new URLSearchParams();
 
 const SHOP_SLUG =
-  import.meta.env.VITE_SHOP_SLUG || "christchurch";
+  urlParams.get("shop") || import.meta.env.VITE_SHOP_SLUG || "christchurch";
+
+const CRM_LEAD_URL =
+  import.meta.env.VITE_CRM_LEAD_URL ||
+  "https://crm.cleancarcollective.co.nz/api/leads/intake";
+
+// Per-shop thank-you destinations. Add new rows here when a shop comes online.
+// VITE_THANK_YOU_URL still wins if set — handy for one-off staging deploys.
+const THANK_YOU_URLS: Record<string, string> = {
+  christchurch:
+    "https://cleancarcollective.co.nz/christchurch-quote-confirmed/",
+  wellington:
+    "https://cleancarcollective.co.nz/wellington-quote-confirmed/",
+};
+
+const THANK_YOU_URL =
+  import.meta.env.VITE_THANK_YOU_URL ||
+  THANK_YOU_URLS[SHOP_SLUG] ||
+  THANK_YOU_URLS.christchurch;
 
 const SERVICES = [
   "Inside and out package options",
