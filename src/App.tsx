@@ -11,6 +11,18 @@ const urlParams =
 const SHOP_SLUG =
   urlParams.get("shop") || import.meta.env.VITE_SHOP_SLUG || "christchurch";
 
+// Google Ads attribution. The host page (cleancarcollective.co.nz) captures
+// gclid/gbraid/wbraid into a cookie when an ad sends the user to the site.
+// That cookie isn't visible from this iframe (different origin), so the host
+// page passes attribution through to the iframe via URL query params on the
+// iframe src. We read them here and forward to the CRM with each lead.
+const ATTRIBUTION = {
+  gclid: urlParams.get("gclid") || undefined,
+  gbraid: urlParams.get("gbraid") || undefined,
+  wbraid: urlParams.get("wbraid") || undefined,
+  landing_url: urlParams.get("landing_url") || undefined,
+};
+
 const CRM_LEAD_URL =
   import.meta.env.VITE_CRM_LEAD_URL ||
   "https://crm.cleancarcollective.co.nz/api/leads/intake";
@@ -94,6 +106,7 @@ export default function App() {
           notes: form.notes || undefined,
           shop_slug: SHOP_SLUG,
           source: "website-lead-form",
+          ...ATTRIBUTION,
         }),
       });
 
