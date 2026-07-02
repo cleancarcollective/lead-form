@@ -114,10 +114,11 @@ const CSS = `
 .ccc-more-label{display:flex;align-items:center;gap:8px;font-size:12.5px;font-weight:600;color:#0a0a0a;margin-bottom:11px}
 .ccc-more-label svg{width:16px;height:16px;flex:none;display:block;color:#0a0a0a}
 .ccc-more-btns{display:grid;grid-template-columns:1fr 1fr;gap:9px}
-.ccc-chip{display:flex;align-items:center;justify-content:space-between;gap:8px;width:100%;padding:12px 14px;border:1px solid #d6d6d6;border-radius:10px;background:#fff;font-family:inherit;font-size:13.5px;font-weight:600;color:#0a0a0a;cursor:pointer;text-align:left;transition:transform .12s ease,border-color .12s ease,box-shadow .12s ease}
-.ccc-chip svg{width:15px;height:15px;flex:none;display:block;color:#9a9a9a;transition:transform .12s ease,color .12s ease}
-.ccc-chip:hover{border-color:#0a0a0a;box-shadow:0 4px 14px rgba(10,10,10,.10);transform:translateY(-1px)}
-.ccc-chip:hover svg{color:#0a0a0a;transform:translateX(2px)}
+.ccc-chip{display:flex;align-items:center;justify-content:space-between;gap:8px;width:100%;padding:13px 15px;border:1.5px solid #0a0a0a;border-radius:10px;background:#fff;font-family:inherit;font-size:13.5px;font-weight:600;color:#0a0a0a;cursor:pointer;text-align:left;transition:transform .12s ease,background .15s ease,color .15s ease,box-shadow .15s ease}
+.ccc-chip svg{width:15px;height:15px;flex:none;display:block;color:#0a0a0a;transition:transform .12s ease,color .15s ease}
+.ccc-chip:hover{background:#0a0a0a;color:#fff;box-shadow:0 6px 18px rgba(10,10,10,.18);transform:translateY(-1px)}
+.ccc-chip:hover svg{color:#fff;transform:translateX(3px)}
+.ccc-chip:active{transform:translateY(0) scale(.99)}
 
 /* "need something else?" get-in-touch block */
 .ccc-git{margin-top:10px;padding:15px 16px 16px;border:1px solid #ececec;border-radius:12px;background:#fbfbfb}
