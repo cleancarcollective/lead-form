@@ -1,4 +1,5 @@
 import { useState } from "react";
+import { buildQuoteHtml, type Quote } from "./quoteScreen";
 
 // Read ?shop=wellington from the iframe URL, falling back to env / default.
 // Single deployment serves every shop — embed pages set the param on the
@@ -52,21 +53,12 @@ const BOOKING_URLS: Record<string, string> = {
 
 const BOOKING_URL = BOOKING_URLS[SHOP_SLUG] || BOOKING_URLS.christchurch;
 
-type QuotePackage = {
-  name: string;
-  price: number | null;
-  price_label: string;
-  duration: string;
-  highlights: string[];
-  booking_service_id: string;
+// Per-shop phone shown on the quote screen's "prefer to talk?" line.
+const SHOP_PHONE: Record<string, { display: string; tel: string }> = {
+  christchurch: { display: "022 153 7335", tel: "0221537335" },
+  wellington: { display: "0800 476 667", tel: "0800476667" },
 };
-
-type Quote = {
-  template_key: string;
-  size: string | null;
-  booking_vehicle_type: string | null;
-  packages: QuotePackage[];
-};
+const PHONE = SHOP_PHONE[SHOP_SLUG] || SHOP_PHONE.christchurch;
 
 const SERVICES = [
   "Inside and out package options",
@@ -174,9 +166,18 @@ export default function App() {
     }
   }
 
-  function openBooking(pkg: QuotePackage) {
+  // Book-now buttons live inside the designed HTML (rendered via
+  // dangerouslySetInnerHTML), so wire them with one delegated click handler
+  // that reads the service id off the clicked button and deep-links the
+  // booking page with the package + vehicle pre-filled.
+  function handleQuoteClick(e: React.MouseEvent<HTMLDivElement>) {
+    const el = (e.target as HTMLElement).closest<HTMLElement>("[data-book-service]");
+    if (!el) return;
+    e.preventDefault();
+    const serviceId = el.getAttribute("data-book-service");
+    if (!serviceId) return;
     const params = new URLSearchParams();
-    params.set("service", pkg.booking_service_id);
+    params.set("service", serviceId);
     if (quote?.booking_vehicle_type) params.set("vehicle", quote.booking_vehicle_type);
     const url = `${BOOKING_URL}?${params.toString()}`;
     try {
@@ -194,42 +195,12 @@ export default function App() {
 
   if (status === "quote" && quote) {
     return (
-      <div style={s.page}>
-        <div style={s.card}>
-          <h2 style={s.title}>Your estimate</h2>
-          <p style={s.quoteIntro}>
-            Based on your {form.vehicle.trim() || "vehicle"}, here are your options.
-            We've also emailed this to {form.email.trim() || "you"}.
-          </p>
-
-          <div style={s.quoteList}>
-            {quote.packages.map((pkg) => (
-              <div key={pkg.booking_service_id} style={s.quoteCard}>
-                <div style={s.quoteCardHead}>
-                  <div>
-                    <p style={s.quoteName}>{pkg.name}</p>
-                    <p style={s.quoteDuration}>{pkg.duration}</p>
-                  </div>
-                  <p style={s.quotePrice}>{pkg.price_label}</p>
-                </div>
-                <ul style={s.quoteHighlights}>
-                  {pkg.highlights.map((h) => (
-                    <li key={h} style={s.quoteHighlight}>{h}</li>
-                  ))}
-                </ul>
-                <button type="button" onClick={() => openBooking(pkg)} style={s.button}>
-                  Book now
-                </button>
-              </div>
-            ))}
-          </div>
-
-          <p style={s.quoteFootnote}>
-            Prices exclude GST. Want to tweak the package or ask a question?
-            Just reply to the email and we'll sort it.
-          </p>
-        </div>
-      </div>
+      <div
+        onClick={handleQuoteClick}
+        dangerouslySetInnerHTML={{
+          __html: buildQuoteHtml(quote, form.vehicle, PHONE),
+        }}
+      />
     );
   }
 
