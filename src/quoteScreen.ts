@@ -136,6 +136,7 @@ const CSS = `
 .ccc-foot span{display:flex;align-items:center;gap:6px}
 .ccc-foot svg{width:13px;height:13px;flex:none;display:block}
 @media (min-width:560px){.ccc-estimate{padding:24px 22px 30px}.ccc-cards{grid-template-columns:1fr 1fr;gap:16px;align-items:stretch}.ccc-cta-wrap{margin-top:auto}.ccc-head h1{font-size:25px}}
+@media (max-width:430px){.ccc-estimate{padding:18px 14px 26px}.ccc-card{padding:18px 16px 16px}.ccc-more,.ccc-git{padding:14px 14px 15px}.ccc-note{padding:12px 13px}.ccc-scarce{padding:10px 12px;font-size:12.5px}}
 @media (max-width:400px){.ccc-trust{gap:5px 12px;padding:10px 12px}.ccc-trust .ccc-t-sep{display:none}.ccc-head h1{font-size:21px}.ccc-price .ccc-amt{font-size:24px}}
 `;
 
