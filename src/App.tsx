@@ -1,5 +1,6 @@
 import { useState } from "react";
 import { buildQuoteHtml, type Quote } from "./quoteScreen";
+import { MOCK_QUOTES, PREVIEW_VARIANTS } from "./previewMocks";
 
 // Read ?shop=wellington from the iframe URL, falling back to env / default.
 // Single deployment serves every shop — embed pages set the param on the
@@ -64,6 +65,12 @@ const CONTACT = {
   email: "hello@cleancarcollective.co.nz",
 };
 
+// UI preview mode: ?preview=<variant> renders the quote screen with mock
+// data — no CRM call, no lead created. For fast design iteration only.
+const PREVIEW_KEY = urlParams.get("preview");
+const IS_PREVIEW = !!PREVIEW_KEY && !!MOCK_QUOTES[PREVIEW_KEY];
+const PREVIEW_VEHICLE = urlParams.get("veh") || "2008 Porsche 911 Turbo S";
+
 const SERVICES = [
   "Inside and out package options",
   "Interior only",
@@ -96,9 +103,11 @@ type Status = "idle" | "submitting" | "error" | "quote";
 
 export default function App() {
   const [form, setForm] = useState<FormState>(EMPTY);
-  const [status, setStatus] = useState<Status>("idle");
+  const [status, setStatus] = useState<Status>(IS_PREVIEW ? "quote" : "idle");
   const [errorMessage, setErrorMessage] = useState("");
-  const [quote, setQuote] = useState<Quote | null>(null);
+  const [quote, setQuote] = useState<Quote | null>(
+    IS_PREVIEW ? MOCK_QUOTES[PREVIEW_KEY!] : null
+  );
 
   function handleChange(
     e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement | HTMLTextAreaElement>
@@ -198,13 +207,17 @@ export default function App() {
   const isSubmitting = status === "submitting";
 
   if (status === "quote" && quote) {
+    const vehicleText = IS_PREVIEW ? PREVIEW_VEHICLE : form.vehicle;
     return (
-      <div
-        onClick={handleQuoteClick}
-        dangerouslySetInnerHTML={{
-          __html: buildQuoteHtml(quote, form.vehicle, CONTACT),
-        }}
-      />
+      <>
+        {IS_PREVIEW && <PreviewBar current={PREVIEW_KEY!} />}
+        <div
+          onClick={handleQuoteClick}
+          dangerouslySetInnerHTML={{
+            __html: buildQuoteHtml(quote, vehicleText, CONTACT),
+          }}
+        />
+      </>
     );
   }
 
@@ -334,6 +347,64 @@ function Field({
     </div>
   );
 }
+
+// Dev-only toolbar shown in ?preview mode so the quote UI can be flipped
+// between package types + shops without submitting a lead.
+function PreviewBar({ current }: { current: string }) {
+  const link = (key: string, shop: string) =>
+    `?preview=${key}&shop=${shop}&veh=${encodeURIComponent(PREVIEW_VEHICLE)}`;
+  const otherShop = SHOP_SLUG === "wellington" ? "christchurch" : "wellington";
+  return (
+    <div style={pb.bar}>
+      <span style={pb.tag}>PREVIEW · mock data, no lead created</span>
+      <div style={pb.group}>
+        {PREVIEW_VARIANTS.map((v) => (
+          <a
+            key={v.key}
+            href={link(v.key, SHOP_SLUG)}
+            style={{ ...pb.chip, ...(v.key === current ? pb.chipOn : null) }}
+          >
+            {v.label}
+          </a>
+        ))}
+      </div>
+      <a href={link(current, otherShop)} style={pb.shop}>
+        shop: {SHOP_SLUG} ⟳
+      </a>
+    </div>
+  );
+}
+
+const pb: Record<string, React.CSSProperties> = {
+  bar: {
+    display: "flex",
+    flexWrap: "wrap",
+    alignItems: "center",
+    gap: "8px 12px",
+    padding: "10px 14px",
+    background: "#0a0a0a",
+    color: "#fff",
+    fontFamily: "-apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif",
+    fontSize: "12px",
+  },
+  tag: { color: "#ffce4f", fontWeight: 700, letterSpacing: "0.03em" },
+  group: { display: "flex", flexWrap: "wrap", gap: "6px" },
+  chip: {
+    padding: "5px 11px",
+    borderRadius: "999px",
+    border: "1px solid #3a3a3a",
+    color: "#d0d0d0",
+    textDecoration: "none",
+    fontWeight: 600,
+  },
+  chipOn: { background: "#fff", color: "#0a0a0a", borderColor: "#fff" },
+  shop: {
+    marginLeft: "auto",
+    color: "#9a9a9a",
+    textDecoration: "none",
+    fontWeight: 600,
+  },
+};
 
 const s: Record<string, React.CSSProperties> = {
   page: {

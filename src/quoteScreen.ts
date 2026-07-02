@@ -165,7 +165,7 @@ function renderCard(pkg: QuotePackage, featured: boolean, anchorDiff: number | n
 
   const anchor =
     featured && anchorDiff && anchorDiff > 0
-      ? `<div class="ccc-anchor">Just <span class="ccc-up">$${anchorDiff} more</span> for the complete result.</div>`
+      ? `<div class="ccc-anchor">Just <span class="ccc-up">$${Math.round(anchorDiff)} more</span> for the complete result.</div>`
       : "";
 
   return `
