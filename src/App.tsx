@@ -42,6 +42,32 @@ const THANK_YOU_URL =
   import.meta.env.VITE_THANK_YOU_URL ||
   THANK_YOU_URLS.christchurch;
 
+// Booking pages (WP pages embedding the booking apps). The instant-quote
+// Book Now buttons navigate the TOP window here with service/vehicle
+// params; the booking apps read them from document.referrer for prefill.
+const BOOKING_URLS: Record<string, string> = {
+  christchurch: "https://cleancarcollective.co.nz/christchurch-make-a-booking/",
+  wellington: "https://cleancarcollective.co.nz/make-a-booking/",
+};
+
+const BOOKING_URL = BOOKING_URLS[SHOP_SLUG] || BOOKING_URLS.christchurch;
+
+type QuotePackage = {
+  name: string;
+  price: number | null;
+  price_label: string;
+  duration: string;
+  highlights: string[];
+  booking_service_id: string;
+};
+
+type Quote = {
+  template_key: string;
+  size: string | null;
+  booking_vehicle_type: string | null;
+  packages: QuotePackage[];
+};
+
 const SERVICES = [
   "Inside and out package options",
   "Interior only",
@@ -70,12 +96,13 @@ const EMPTY: FormState = {
   notes: "",
 };
 
-type Status = "idle" | "submitting" | "error";
+type Status = "idle" | "submitting" | "error" | "quote";
 
 export default function App() {
   const [form, setForm] = useState<FormState>(EMPTY);
   const [status, setStatus] = useState<Status>("idle");
   const [errorMessage, setErrorMessage] = useState("");
+  const [quote, setQuote] = useState<Quote | null>(null);
 
   function handleChange(
     e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement | HTMLTextAreaElement>
@@ -112,6 +139,23 @@ export default function App() {
 
       if (!response.ok) throw new Error("Submission failed. Please try again.");
 
+      // Instant on-page quote: when the CRM's auto-send gate passes it
+      // returns the same packages+prices the estimate email contains.
+      // Any escalated lead (notes needing a human, unknown vehicle size)
+      // gets quote:null and follows the existing thank-you redirect —
+      // the team emails them manually exactly as before.
+      try {
+        const data = await response.json();
+        if (data?.quote?.packages?.length) {
+          setQuote(data.quote as Quote);
+          setStatus("quote");
+          window.scrollTo({ top: 0 });
+          return;
+        }
+      } catch {
+        // Body parse failure — fall through to the redirect.
+      }
+
       try {
         if (window.top && window.top !== window.self) {
           window.top.location.href = THANK_YOU_URL;
@@ -130,7 +174,64 @@ export default function App() {
     }
   }
 
+  function openBooking(pkg: QuotePackage) {
+    const params = new URLSearchParams();
+    params.set("service", pkg.booking_service_id);
+    if (quote?.booking_vehicle_type) params.set("vehicle", quote.booking_vehicle_type);
+    const url = `${BOOKING_URL}?${params.toString()}`;
+    try {
+      if (window.top && window.top !== window.self) {
+        window.top.location.href = url;
+        return;
+      }
+    } catch {
+      // Embed context blocks top access — same-frame fallback below.
+    }
+    window.location.href = url;
+  }
+
   const isSubmitting = status === "submitting";
+
+  if (status === "quote" && quote) {
+    return (
+      <div style={s.page}>
+        <div style={s.card}>
+          <h2 style={s.title}>Your estimate</h2>
+          <p style={s.quoteIntro}>
+            Based on your {form.vehicle.trim() || "vehicle"}, here are your options.
+            We've also emailed this to {form.email.trim() || "you"}.
+          </p>
+
+          <div style={s.quoteList}>
+            {quote.packages.map((pkg) => (
+              <div key={pkg.booking_service_id} style={s.quoteCard}>
+                <div style={s.quoteCardHead}>
+                  <div>
+                    <p style={s.quoteName}>{pkg.name}</p>
+                    <p style={s.quoteDuration}>{pkg.duration}</p>
+                  </div>
+                  <p style={s.quotePrice}>{pkg.price_label}</p>
+                </div>
+                <ul style={s.quoteHighlights}>
+                  {pkg.highlights.map((h) => (
+                    <li key={h} style={s.quoteHighlight}>{h}</li>
+                  ))}
+                </ul>
+                <button type="button" onClick={() => openBooking(pkg)} style={s.button}>
+                  Book now
+                </button>
+              </div>
+            ))}
+          </div>
+
+          <p style={s.quoteFootnote}>
+            Prices exclude GST. Want to tweak the package or ask a question?
+            Just reply to the email and we'll sort it.
+          </p>
+        </div>
+      </div>
+    );
+  }
 
   return (
     <div style={s.page}>
@@ -368,5 +469,66 @@ const s: Record<string, React.CSSProperties> = {
   buttonDisabled: {
     opacity: 0.5,
     cursor: "not-allowed",
+  },
+  quoteIntro: {
+    margin: "-12px 0 20px",
+    fontSize: "14px",
+    color: "#555555",
+    lineHeight: 1.5,
+  },
+  quoteList: {
+    display: "flex",
+    flexDirection: "column",
+    gap: "14px",
+  },
+  quoteCard: {
+    border: "1.5px solid #d0d0d0",
+    borderRadius: "8px",
+    padding: "16px",
+    display: "flex",
+    flexDirection: "column",
+    gap: "10px",
+  },
+  quoteCardHead: {
+    display: "flex",
+    justifyContent: "space-between",
+    alignItems: "flex-start",
+    gap: "12px",
+  },
+  quoteName: {
+    margin: 0,
+    fontSize: "16px",
+    fontWeight: 700,
+    color: "#0a0a0a",
+  },
+  quoteDuration: {
+    margin: "2px 0 0",
+    fontSize: "12px",
+    color: "#777777",
+  },
+  quotePrice: {
+    margin: 0,
+    fontSize: "16px",
+    fontWeight: 700,
+    color: "#0a0a0a",
+    whiteSpace: "nowrap",
+  },
+  quoteHighlights: {
+    margin: 0,
+    paddingLeft: "18px",
+    display: "flex",
+    flexDirection: "column",
+    gap: "3px",
+  },
+  quoteHighlight: {
+    fontSize: "13px",
+    color: "#444444",
+    lineHeight: 1.45,
+  },
+  quoteFootnote: {
+    margin: "18px 0 0",
+    fontSize: "12px",
+    color: "#777777",
+    lineHeight: 1.5,
   },
 };
