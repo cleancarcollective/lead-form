@@ -65,6 +65,37 @@ const CONTACT = {
   email: "hello@cleancarcollective.co.nz",
 };
 
+// Layer-3 tracking: fire-and-forget funnel beacons to the CRM, keyed by
+// lead_id. sendBeacon (text/plain, no preflight) survives the page
+// navigation that a Book click triggers. No-ops without a lead_id (e.g.
+// ?preview mode), so it never fires for mock data.
+const CRM_QUOTE_EVENTS_URL =
+  import.meta.env.VITE_CRM_QUOTE_EVENTS_URL ||
+  "https://crm.cleancarcollective.co.nz/api/quote-events";
+
+function sendQuoteEvent(
+  leadId: string | null,
+  event: string,
+  meta: Record<string, unknown> = {}
+) {
+  if (!leadId) return;
+  try {
+    const body = JSON.stringify({ lead_id: leadId, event, meta, shop_slug: SHOP_SLUG });
+    if (typeof navigator !== "undefined" && navigator.sendBeacon) {
+      navigator.sendBeacon(CRM_QUOTE_EVENTS_URL, new Blob([body], { type: "text/plain" }));
+    } else {
+      void fetch(CRM_QUOTE_EVENTS_URL, {
+        method: "POST",
+        headers: { "Content-Type": "text/plain" },
+        body,
+        keepalive: true,
+      }).catch(() => {});
+    }
+  } catch {
+    /* non-fatal */
+  }
+}
+
 // UI preview mode: ?preview=<variant> renders the quote screen with mock
 // data — no CRM call, no lead created. For fast design iteration only.
 const PREVIEW_KEY = urlParams.get("preview");
@@ -108,6 +139,7 @@ export default function App() {
   const [quote, setQuote] = useState<Quote | null>(
     IS_PREVIEW ? MOCK_QUOTES[PREVIEW_KEY!] : null
   );
+  const [leadId, setLeadId] = useState<string | null>(null);
 
   function handleChange(
     e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement | HTMLTextAreaElement>
@@ -151,9 +183,15 @@ export default function App() {
       // the team emails them manually exactly as before.
       try {
         const data = await response.json();
+        const newLeadId = typeof data?.lead_id === "string" ? data.lead_id : null;
+        if (newLeadId) setLeadId(newLeadId);
         if (data?.quote?.packages?.length) {
           setQuote(data.quote as Quote);
           setStatus("quote");
+          sendQuoteEvent(newLeadId, "quote_view", {
+            template_key: data.quote.template_key,
+            packages: data.quote.packages.length,
+          });
           window.scrollTo({ top: 0 });
           return;
         }
@@ -183,16 +221,7 @@ export default function App() {
   // dangerouslySetInnerHTML), so wire them with one delegated click handler
   // that reads the service id off the clicked button and deep-links the
   // booking page with the package + vehicle pre-filled.
-  function handleQuoteClick(e: React.MouseEvent<HTMLDivElement>) {
-    const el = (e.target as HTMLElement).closest<HTMLElement>("[data-book-service]");
-    if (!el) return;
-    e.preventDefault();
-    const serviceId = el.getAttribute("data-book-service");
-    if (!serviceId) return;
-    const params = new URLSearchParams();
-    params.set("service", serviceId);
-    if (quote?.booking_vehicle_type) params.set("vehicle", quote.booking_vehicle_type);
-    const url = `${BOOKING_URL}?${params.toString()}`;
+  function navigateTop(url: string) {
     try {
       if (window.top && window.top !== window.self) {
         window.top.location.href = url;
@@ -202,6 +231,38 @@ export default function App() {
       // Embed context blocks top access — same-frame fallback below.
     }
     window.location.href = url;
+  }
+
+  function handleQuoteClick(e: React.MouseEvent<HTMLDivElement>) {
+    const target = e.target as HTMLElement;
+
+    // Book / add-on shortcuts → deep-link the booking page with the package
+    // + vehicle pre-filled, tagged src=quote so the booking is attributed
+    // back to the quote screen.
+    const bookEl = target.closest<HTMLElement>("[data-book-service]");
+    if (bookEl) {
+      e.preventDefault();
+      const serviceId = bookEl.getAttribute("data-book-service");
+      if (!serviceId) return;
+      const kind = bookEl.getAttribute("data-book-kind") || "package";
+      sendQuoteEvent(leadId, kind === "addon" ? "addon_click" : "book_click", {
+        service: serviceId,
+      });
+      const params = new URLSearchParams();
+      params.set("service", serviceId);
+      if (quote?.booking_vehicle_type) params.set("vehicle", quote.booking_vehicle_type);
+      params.set("src", "quote");
+      navigateTop(`${BOOKING_URL}?${params.toString()}`);
+      return;
+    }
+
+    // Call / Email — let the tel:/mailto: link fire natively; just log it.
+    const contactEl = target.closest<HTMLElement>("[data-contact]");
+    if (contactEl) {
+      sendQuoteEvent(leadId, "contact_click", {
+        method: contactEl.getAttribute("data-contact"),
+      });
+    }
   }
 
   const isSubmitting = status === "submitting";

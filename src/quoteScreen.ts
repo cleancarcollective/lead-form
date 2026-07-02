@@ -193,7 +193,7 @@ function renderCard(pkg: QuotePackage, featured: boolean, anchorDiff: number | n
       <div class="ccc-inc-label">${esc(incLabel)}</div>
       <ul class="ccc-inc">${items}</ul>
       <div class="ccc-cta-wrap">
-        <button type="button" class="ccc-cta" data-book-service="${esc(pkg.booking_service_id)}">
+        <button type="button" class="ccc-cta" data-book-service="${esc(pkg.booking_service_id)}" data-book-kind="package">
           Book ${esc(firstWord)}${IC.arrow}
         </button>
         <div class="ccc-subcta">${IC.clockSm}Takes ~60 seconds · package pre-filled</div>
@@ -252,15 +252,15 @@ export function buildQuoteHtml(
   <div class="ccc-more">
     <div class="ccc-more-label">${IC.sparkle} Want something else?</div>
     <div class="ccc-more-btns">
-      <button type="button" class="ccc-chip" data-book-service="1-step-correction">Paint correction ${IC.arrow}</button>
-      <button type="button" class="ccc-chip" data-book-service="ceramic-bronze">Ceramic coating ${IC.arrow}</button>
+      <button type="button" class="ccc-chip" data-book-service="1-step-correction" data-book-kind="addon">Paint correction ${IC.arrow}</button>
+      <button type="button" class="ccc-chip" data-book-service="ceramic-bronze" data-book-kind="addon">Ceramic coating ${IC.arrow}</button>
     </div>
   </div>
   <div class="ccc-git">
     <p class="ccc-git-lead"><strong>Need something else?</strong> Tell us what you’re after and we’ll get you sorted.</p>
     <div class="ccc-git-btns">
-      <a class="ccc-git-btn ccc-git-call" href="tel:${esc(phone.tel)}">${IC.phone} Call ${esc(phone.display)}</a>
-      <a class="ccc-git-btn ccc-git-email" href="mailto:${esc(email)}?subject=${encodeURIComponent("Detailing enquiry: " + vehicle)}">${IC.mail} Email us</a>
+      <a class="ccc-git-btn ccc-git-call" data-contact="call" href="tel:${esc(phone.tel)}">${IC.phone} Call ${esc(phone.display)}</a>
+      <a class="ccc-git-btn ccc-git-email" data-contact="email" href="mailto:${esc(email)}?subject=${encodeURIComponent("Detailing enquiry: " + vehicle)}">${IC.mail} Email us</a>
     </div>
   </div>
   <div class="ccc-foot">
