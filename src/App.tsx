@@ -53,12 +53,16 @@ const BOOKING_URLS: Record<string, string> = {
 
 const BOOKING_URL = BOOKING_URLS[SHOP_SLUG] || BOOKING_URLS.christchurch;
 
-// Per-shop phone shown on the quote screen's "prefer to talk?" line.
+// Contact details for the quote screen's "get in touch" block. The 0800
+// line is national, so both shops use it.
 const SHOP_PHONE: Record<string, { display: string; tel: string }> = {
-  christchurch: { display: "022 153 7335", tel: "0221537335" },
+  christchurch: { display: "0800 476 667", tel: "0800476667" },
   wellington: { display: "0800 476 667", tel: "0800476667" },
 };
-const PHONE = SHOP_PHONE[SHOP_SLUG] || SHOP_PHONE.christchurch;
+const CONTACT = {
+  phone: SHOP_PHONE[SHOP_SLUG] || SHOP_PHONE.christchurch,
+  email: "hello@cleancarcollective.co.nz",
+};
 
 const SERVICES = [
   "Inside and out package options",
@@ -198,7 +202,7 @@ export default function App() {
       <div
         onClick={handleQuoteClick}
         dangerouslySetInnerHTML={{
-          __html: buildQuoteHtml(quote, form.vehicle, PHONE),
+          __html: buildQuoteHtml(quote, form.vehicle, CONTACT),
         }}
       />
     );

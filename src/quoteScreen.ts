@@ -69,8 +69,10 @@ const CSS = `
 .ccc-emailed{display:flex;align-items:center;gap:7px;margin-top:10px;font-size:13.5px;color:#555}
 .ccc-emailed svg{flex:none;width:15px;height:15px;display:block;color:#0a0a0a}
 .ccc-cards{display:grid;grid-template-columns:1fr;gap:16px}
-.ccc-card{position:relative;border:1px solid #e2e2e2;border-radius:16px;background:#fff;padding:20px 18px 18px;display:flex;flex-direction:column}
+.ccc-card{position:relative;border:1px solid #e2e2e2;border-radius:16px;background:#fff;padding:20px 18px 18px;display:flex;flex-direction:column;transition:transform .14s ease,box-shadow .14s ease,border-color .14s ease}
+.ccc-card--std:hover{border-color:#0a0a0a;transform:translateY(-2px);box-shadow:0 8px 24px rgba(10,10,10,.10)}
 .ccc-card--feat{border:1.5px solid #0a0a0a;box-shadow:0 4px 20px rgba(10,10,10,.09)}
+.ccc-card--feat:hover{transform:translateY(-2px);box-shadow:0 10px 30px rgba(10,10,10,.16)}
 .ccc-badge{position:absolute;top:-11px;left:18px;display:inline-flex;align-items:center;gap:5px;background:#0a0a0a;color:#fff;font-size:11px;font-weight:600;letter-spacing:.04em;padding:5px 11px;border-radius:999px;text-transform:uppercase}
 .ccc-badge svg{width:12px;height:12px;display:block;color:#ffce4f}
 .ccc-card-top{display:flex;justify-content:space-between;align-items:flex-start;gap:12px}
@@ -101,10 +103,29 @@ const CSS = `
 .ccc-note{display:flex;align-items:flex-start;gap:10px;padding:13px 15px;border:1px solid #ececec;border-radius:12px;background:#fbfbfb;font-size:13px;color:#444;line-height:1.45}
 .ccc-note svg{flex:none;width:17px;height:17px;margin-top:1px;display:block;color:#0a0a0a}
 .ccc-note strong{font-weight:600;color:#0a0a0a}
-.ccc-note--call{background:#0a0a0a;border-color:#0a0a0a;color:#e6e6e6}
-.ccc-note--call svg{color:#fff}
-.ccc-note--call a{color:#fff;font-weight:700;text-decoration:none;letter-spacing:.01em}
-.ccc-note--call a:hover{text-decoration:underline}
+
+/* "want something else?" add-on shortcuts — deep-link the booking page */
+.ccc-more{margin-top:10px;padding:15px 16px 16px;border:1px solid #ececec;border-radius:12px;background:#fbfbfb}
+.ccc-more-label{display:flex;align-items:center;gap:8px;font-size:12.5px;font-weight:600;color:#0a0a0a;margin-bottom:11px}
+.ccc-more-label svg{width:16px;height:16px;flex:none;display:block;color:#0a0a0a}
+.ccc-more-btns{display:grid;grid-template-columns:1fr 1fr;gap:9px}
+.ccc-chip{display:flex;align-items:center;justify-content:space-between;gap:8px;width:100%;padding:12px 14px;border:1px solid #d6d6d6;border-radius:10px;background:#fff;font-family:inherit;font-size:13.5px;font-weight:600;color:#0a0a0a;cursor:pointer;text-align:left;transition:transform .12s ease,border-color .12s ease,box-shadow .12s ease}
+.ccc-chip svg{width:15px;height:15px;flex:none;display:block;color:#9a9a9a;transition:transform .12s ease,color .12s ease}
+.ccc-chip:hover{border-color:#0a0a0a;box-shadow:0 4px 14px rgba(10,10,10,.10);transform:translateY(-1px)}
+.ccc-chip:hover svg{color:#0a0a0a;transform:translateX(2px)}
+
+/* "need something else?" get-in-touch block */
+.ccc-git{margin-top:10px;padding:15px 16px 16px;border:1px solid #ececec;border-radius:12px;background:#fbfbfb}
+.ccc-git-lead{font-size:13px;color:#444;line-height:1.45;margin-bottom:12px}
+.ccc-git-lead strong{color:#0a0a0a;font-weight:600}
+.ccc-git-btns{display:grid;grid-template-columns:1fr 1fr;gap:9px}
+.ccc-git-btn{display:flex;align-items:center;justify-content:center;gap:8px;padding:12px 14px;border-radius:10px;font-family:inherit;font-size:13.5px;font-weight:600;text-decoration:none;cursor:pointer;transition:transform .12s ease,background .15s ease,box-shadow .15s ease,color .15s ease}
+.ccc-git-btn svg{width:16px;height:16px;flex:none;display:block}
+.ccc-git-call{background:#0a0a0a;color:#fff;border:1.5px solid #0a0a0a}
+.ccc-git-call:hover{background:#1f1f1f;box-shadow:0 6px 18px rgba(10,10,10,.22);transform:translateY(-1px)}
+.ccc-git-email{background:#fff;color:#0a0a0a;border:1.5px solid #0a0a0a}
+.ccc-git-email:hover{background:#0a0a0a;color:#fff;box-shadow:0 6px 18px rgba(10,10,10,.18);transform:translateY(-1px)}
+@media (max-width:400px){.ccc-more-btns{grid-template-columns:1fr}.ccc-git-btns{grid-template-columns:1fr}}
 .ccc-foot{margin-top:20px;padding-top:16px;border-top:1px solid #eee;display:flex;flex-wrap:wrap;gap:6px 18px;font-size:11.5px;color:#9a9a9a}
 .ccc-foot span{display:flex;align-items:center;gap:6px}
 .ccc-foot svg{width:13px;height:13px;flex:none;display:block}
@@ -173,11 +194,17 @@ function renderCard(pkg: QuotePackage, featured: boolean, anchorDiff: number | n
     </div>`;
 }
 
+export type QuoteContact = {
+  phone: { display: string; tel: string };
+  email: string;
+};
+
 export function buildQuoteHtml(
   quote: Quote,
   vehicleText: string,
-  phone: { display: string; tel: string }
+  contact: QuoteContact
 ): string {
+  const { phone, email } = contact;
   const vehicle = vehicleText.trim() || "your vehicle";
   const packages = quote.packages;
   const featuredIdx = packages.length >= 2 ? 1 : -1;
@@ -208,8 +235,20 @@ export function buildQuoteHtml(
   <div class="ccc-cards">${cards}</div>
   <div class="ccc-notes">
     <div class="ccc-note">${IC.wrench}<span><strong>Every package can be tailored to your car</strong> — just mention what you need when you book.</span></div>
-    <div class="ccc-note">${IC.sparkle}<span>Want <strong>paint correction or a ceramic coating?</strong> Mention it and we’ll add it to your quote.</span></div>
-    <div class="ccc-note ccc-note--call">${IC.phone}<span>Prefer to talk it through? Call us on <a href="tel:${esc(phone.tel)}">${esc(phone.display)}</a>.</span></div>
+  </div>
+  <div class="ccc-more">
+    <div class="ccc-more-label">${IC.sparkle} Want something else?</div>
+    <div class="ccc-more-btns">
+      <button type="button" class="ccc-chip" data-book-service="1-step-correction">Paint correction ${IC.arrow}</button>
+      <button type="button" class="ccc-chip" data-book-service="ceramic-bronze">Ceramic coating ${IC.arrow}</button>
+    </div>
+  </div>
+  <div class="ccc-git">
+    <p class="ccc-git-lead"><strong>Need something else?</strong> Tell us what you’re after and we’ll get you sorted.</p>
+    <div class="ccc-git-btns">
+      <a class="ccc-git-btn ccc-git-call" href="tel:${esc(phone.tel)}">${IC.phone} Call ${esc(phone.display)}</a>
+      <a class="ccc-git-btn ccc-git-email" href="mailto:${esc(email)}?subject=${encodeURIComponent("Detailing enquiry — " + vehicle)}">${IC.mail} Email us</a>
+    </div>
   </div>
   <div class="ccc-foot">
     <span>${IC.info} Prices exclude GST.</span>
