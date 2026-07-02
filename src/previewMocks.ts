@@ -1,6 +1,6 @@
 // Mock quote payloads for UI preview only (?preview=<variant>).
 // Mirrors the exact shape the CRM /api/leads/intake returns so the preview
-// renders identically to production — but with NO network call and NO lead
+// renders identically to production, but with NO network call and NO lead
 // created. Never used in the real submit path.
 
 import type { Quote } from "./quoteScreen";

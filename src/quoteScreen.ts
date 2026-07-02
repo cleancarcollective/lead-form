@@ -1,4 +1,4 @@
-// Instant-quote result screen — conversion-forward design.
+// Instant-quote result screen (conversion-forward design).
 //
 // Rendered as an HTML string (via dangerouslySetInnerHTML) rather than JSX
 // so the designed markup + inline SVGs stay verbatim. App.tsx wires the
@@ -61,6 +61,11 @@ const CSS = `
 .ccc-trust .ccc-stars svg{width:14px;height:14px}
 .ccc-trust .ccc-t-strong{font-weight:600;color:#0a0a0a}
 .ccc-trust .ccc-t-sep{width:1px;height:14px;background:#e2e2e2}
+.ccc-scarce{display:flex;align-items:center;justify-content:center;gap:9px;margin:0 0 18px;padding:11px 14px;border:1px solid #f4c9c9;background:#fdecec;border-radius:11px;color:#c62828;font-size:13px;font-weight:600;line-height:1.3;text-align:center}
+.ccc-scarce .ccc-dot{width:9px;height:9px;border-radius:50%;background:#e23b3b;flex:none;box-shadow:0 0 0 0 rgba(226,59,59,.5);animation:cccpulse 1.7s ease-in-out infinite}
+.ccc-scarce .ccc-n{font-weight:800}
+@keyframes cccpulse{0%{transform:scale(.85);box-shadow:0 0 0 0 rgba(226,59,59,.5)}70%{transform:scale(1);box-shadow:0 0 0 7px rgba(226,59,59,0)}100%{transform:scale(.85);box-shadow:0 0 0 0 rgba(226,59,59,0)}}
+@media (prefers-reduced-motion:reduce){.ccc-scarce .ccc-dot{animation:none}}
 .ccc-head{margin-bottom:20px}
 .ccc-eyebrow{display:inline-flex;align-items:center;gap:6px;font-size:11px;font-weight:600;letter-spacing:.08em;text-transform:uppercase;color:#6a6a6a;margin-bottom:9px}
 .ccc-eyebrow svg{width:13px;height:13px;display:block}
@@ -104,7 +109,7 @@ const CSS = `
 .ccc-note svg{flex:none;width:17px;height:17px;margin-top:1px;display:block;color:#0a0a0a}
 .ccc-note strong{font-weight:600;color:#0a0a0a}
 
-/* "want something else?" add-on shortcuts — deep-link the booking page */
+/* "want something else?" add-on shortcuts (deep-link the booking page) */
 .ccc-more{margin-top:10px;padding:15px 16px 16px;border:1px solid #ececec;border-radius:12px;background:#fbfbfb}
 .ccc-more-label{display:flex;align-items:center;gap:8px;font-size:12.5px;font-weight:600;color:#0a0a0a;margin-bottom:11px}
 .ccc-more-label svg{width:16px;height:16px;flex:none;display:block;color:#0a0a0a}
@@ -216,6 +221,11 @@ export function buildQuoteHtml(
     .map((p, i) => renderCard(p, i === featuredIdx, anchorDiff))
     .join("");
 
+  // Light scarcity nudge. Eases down as the week progresses so it never
+  // reads as a static fib. Indexed by day-of-week (Sun..Sat).
+  const slotsLeft = [4, 5, 4, 3, 2, 2, 3][new Date().getDay()] ?? 3;
+  const scarcity = `<div class="ccc-scarce"><span class="ccc-dot"></span>Only <span class="ccc-n">${slotsLeft}</span> booking${slotsLeft === 1 ? "" : "s"} left this week</div>`;
+
   return `<div class="ccc-estimate"><style>${CSS}</style>
   <p class="sr-only">Your detailing estimate for the ${esc(vehicle)}, with package options and booking links.</p>
   <div class="ccc-trust" role="group" aria-label="Trust signals">
@@ -230,11 +240,12 @@ export function buildQuoteHtml(
   <div class="ccc-head">
     <span class="ccc-eyebrow">${IC.car} Your estimate</span>
     <h1>Here’s your estimate for the<br><span class="ccc-veh">${esc(vehicle)}</span></h1>
-    <p class="ccc-emailed">${IC.mail} A copy is on its way to your inbox — but you can book right here.</p>
+    <p class="ccc-emailed">${IC.mail} A copy is on its way to your inbox, and you can book right here.</p>
   </div>
+  ${scarcity}
   <div class="ccc-cards">${cards}</div>
   <div class="ccc-notes">
-    <div class="ccc-note">${IC.wrench}<span><strong>Every package can be tailored to your car</strong> — just mention what you need when you book.</span></div>
+    <div class="ccc-note">${IC.wrench}<span><strong>Every package can be tailored to your car.</strong> Just mention what you need when you book.</span></div>
   </div>
   <div class="ccc-more">
     <div class="ccc-more-label">${IC.sparkle} Want something else?</div>
@@ -247,7 +258,7 @@ export function buildQuoteHtml(
     <p class="ccc-git-lead"><strong>Need something else?</strong> Tell us what you’re after and we’ll get you sorted.</p>
     <div class="ccc-git-btns">
       <a class="ccc-git-btn ccc-git-call" href="tel:${esc(phone.tel)}">${IC.phone} Call ${esc(phone.display)}</a>
-      <a class="ccc-git-btn ccc-git-email" href="mailto:${esc(email)}?subject=${encodeURIComponent("Detailing enquiry — " + vehicle)}">${IC.mail} Email us</a>
+      <a class="ccc-git-btn ccc-git-email" href="mailto:${esc(email)}?subject=${encodeURIComponent("Detailing enquiry: " + vehicle)}">${IC.mail} Email us</a>
     </div>
   </div>
   <div class="ccc-foot">
