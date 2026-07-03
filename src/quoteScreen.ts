@@ -20,6 +20,8 @@ export type Quote = {
   booking_vehicle_type: string | null;
   /** Short-lived token to prefill the booking form (contact + vehicle). */
   prefill_token?: string | null;
+  /** Ad-promo discount code (e.g. "CCC10") to pre-apply in the booking app. */
+  promo_code?: string | null;
   packages: QuotePackage[];
 };
 

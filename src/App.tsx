@@ -301,6 +301,8 @@ export default function App() {
       params.set("src", "quote");
       // Opaque token → booking form prefills contact + vehicle server-side.
       if (quote?.prefill_token) params.set("pf", quote.prefill_token);
+      // Ad-promo code (e.g. CCC10) → booking app auto-applies the discount.
+      if (quote?.promo_code) params.set("code", quote.promo_code);
       navigateTop(`${BOOKING_URL}?${params.toString()}`);
       return;
     }
