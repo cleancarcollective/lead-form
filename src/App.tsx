@@ -102,6 +102,45 @@ const PREVIEW_KEY = urlParams.get("preview");
 const IS_PREVIEW = !!PREVIEW_KEY && !!MOCK_QUOTES[PREVIEW_KEY];
 const PREVIEW_VEHICLE = urlParams.get("veh") || "2008 Porsche 911 Turbo S";
 
+// Persist a shown quote in sessionStorage so it survives the customer
+// clicking "Book" and hitting back (which reloads the iframe). Same-origin
+// sessionStorage survives that reload within the tab; a fresh session or a
+// >45min-old quote falls back to the form.
+const QUOTE_STORE_KEY = `ccc_quote_${SHOP_SLUG}`;
+const QUOTE_TTL_MS = 45 * 60 * 1000;
+
+function readSavedQuote(): { quote: Quote; leadId: string | null; vehicle: string } | null {
+  if (IS_PREVIEW || typeof window === "undefined") return null;
+  try {
+    const raw = window.sessionStorage.getItem(QUOTE_STORE_KEY);
+    if (!raw) return null;
+    const p = JSON.parse(raw) as {
+      ts?: number;
+      quote?: Quote;
+      leadId?: string | null;
+      vehicle?: string;
+    };
+    if (!p.ts || Date.now() - p.ts > QUOTE_TTL_MS || !p.quote?.packages?.length) return null;
+    return { quote: p.quote, leadId: p.leadId ?? null, vehicle: p.vehicle ?? "" };
+  } catch {
+    return null;
+  }
+}
+
+function saveQuote(quote: Quote, leadId: string | null, vehicle: string) {
+  if (typeof window === "undefined") return;
+  try {
+    window.sessionStorage.setItem(
+      QUOTE_STORE_KEY,
+      JSON.stringify({ ts: Date.now(), quote, leadId, vehicle })
+    );
+  } catch {
+    /* storage blocked — non-fatal */
+  }
+}
+
+const RESTORED = readSavedQuote();
+
 const SERVICES = [
   "Inside and out package options",
   "Interior only",
@@ -134,12 +173,17 @@ type Status = "idle" | "submitting" | "error" | "quote";
 
 export default function App() {
   const [form, setForm] = useState<FormState>(EMPTY);
-  const [status, setStatus] = useState<Status>(IS_PREVIEW ? "quote" : "idle");
+  const [status, setStatus] = useState<Status>(
+    IS_PREVIEW ? "quote" : RESTORED ? "quote" : "idle"
+  );
   const [errorMessage, setErrorMessage] = useState("");
   const [quote, setQuote] = useState<Quote | null>(
-    IS_PREVIEW ? MOCK_QUOTES[PREVIEW_KEY!] : null
+    IS_PREVIEW ? MOCK_QUOTES[PREVIEW_KEY!] : RESTORED?.quote ?? null
   );
-  const [leadId, setLeadId] = useState<string | null>(null);
+  const [leadId, setLeadId] = useState<string | null>(RESTORED?.leadId ?? null);
+  // Vehicle text for the quote headline — kept separate from the live form so
+  // a restored quote still shows the right vehicle after the form has reset.
+  const [quoteVehicle, setQuoteVehicle] = useState<string>(RESTORED?.vehicle ?? "");
 
   function handleChange(
     e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement | HTMLTextAreaElement>
@@ -186,11 +230,14 @@ export default function App() {
         const newLeadId = typeof data?.lead_id === "string" ? data.lead_id : null;
         if (newLeadId) setLeadId(newLeadId);
         if (data?.quote?.packages?.length) {
-          setQuote(data.quote as Quote);
+          const q = data.quote as Quote;
+          setQuote(q);
+          setQuoteVehicle(form.vehicle);
           setStatus("quote");
+          saveQuote(q, newLeadId, form.vehicle);
           sendQuoteEvent(newLeadId, "quote_view", {
-            template_key: data.quote.template_key,
-            packages: data.quote.packages.length,
+            template_key: q.template_key,
+            packages: q.packages.length,
           });
           window.scrollTo({ top: 0 });
           return;
@@ -268,7 +315,7 @@ export default function App() {
   const isSubmitting = status === "submitting";
 
   if (status === "quote" && quote) {
-    const vehicleText = IS_PREVIEW ? PREVIEW_VEHICLE : form.vehicle;
+    const vehicleText = IS_PREVIEW ? PREVIEW_VEHICLE : quoteVehicle || form.vehicle;
     return (
       <>
         {IS_PREVIEW && <PreviewBar current={PREVIEW_KEY!} />}

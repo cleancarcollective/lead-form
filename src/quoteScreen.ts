@@ -48,19 +48,32 @@ const IC = {
   phone: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M5 4h4l2 5-2.5 1.5a11 11 0 005 5L15 13l5 2v4a2 2 0 01-2 2A16 16 0 013 6a2 2 0 012-2z"/></svg>',
   info: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="9"/><path d="M12 8h.01M11 12h1v4h1"/></svg>',
   reply: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 14L4 9l5-5"/><path d="M4 9h11a5 5 0 015 5v3"/></svg>',
+  googleG: '<svg viewBox="0 0 48 48"><path fill="#EA4335" d="M24 9.5c3.54 0 6.71 1.22 9.21 3.6l6.85-6.85C35.9 2.38 30.47 0 24 0 14.62 0 6.51 5.38 2.56 13.22l7.98 6.19C12.43 13.72 17.74 9.5 24 9.5z"/><path fill="#4285F4" d="M46.98 24.55c0-1.57-.15-3.09-.38-4.55H24v9.02h12.94c-.58 2.96-2.26 5.48-4.78 7.18l7.73 6c4.51-4.18 7.09-10.36 7.09-17.65z"/><path fill="#FBBC05" d="M10.53 28.59c-.48-1.45-.76-2.99-.76-4.59s.28-3.14.76-4.59l-7.98-6.19C.92 16.46 0 20.12 0 24c0 3.88.92 7.54 2.56 10.78l7.97-6.19z"/><path fill="#34A853" d="M24 48c6.48 0 11.93-2.13 15.89-5.81l-7.73-6c-2.15 1.45-4.92 2.3-8.16 2.3-6.26 0-11.57-4.22-13.47-9.91l-7.98 6.19C6.51 42.62 14.62 48 24 48z"/></svg>',
+  gStar: '<svg viewBox="0 0 24 24" fill="#fbbc04"><path d="M12 2l2.9 6.1 6.6.9-4.8 4.6 1.2 6.6L12 18.6 6.1 20.8l1.2-6.6L2.5 9l6.6-.9z"/></svg>',
+  verified: '<svg viewBox="0 0 24 24" fill="none" stroke="#1a8a55" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 12l2 2 4-4"/><circle cx="12" cy="12" r="9"/></svg>',
 };
 
 const CSS = `
 .ccc-estimate *{box-sizing:border-box;margin:0;padding:0}
 .ccc-estimate{font-family:'Inter',-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,Helvetica,Arial,sans-serif;color:#0a0a0a;background:#ffffff;line-height:1.5;-webkit-font-smoothing:antialiased;text-rendering:optimizeLegibility;max-width:640px;margin:0 auto;padding:20px 18px 28px}
 .ccc-estimate .sr-only{position:absolute;width:1px;height:1px;padding:0;margin:-1px;overflow:hidden;clip:rect(0,0,0,0);border:0}
-.ccc-trust{display:flex;flex-wrap:wrap;align-items:center;gap:6px 16px;padding:11px 14px;border:1px solid #e2e2e2;border-radius:12px;background:#fafafa;margin-bottom:22px}
-.ccc-trust .ccc-t-item{display:flex;align-items:center;gap:6px;font-size:12.5px;color:#3a3a3a;white-space:nowrap}
-.ccc-trust .ccc-t-item svg{flex:none;display:block}
-.ccc-trust .ccc-stars{display:flex;align-items:center;gap:2px}
-.ccc-trust .ccc-stars svg{width:14px;height:14px}
-.ccc-trust .ccc-t-strong{font-weight:600;color:#0a0a0a}
-.ccc-trust .ccc-t-sep{width:1px;height:14px;background:#e2e2e2}
+.ccc-reviews{display:flex;flex-direction:column;align-items:center;text-align:center;gap:7px;border:1px solid #e6e6e6;border-radius:14px;padding:17px 18px 15px;background:#fff;box-shadow:0 1px 3px rgba(10,10,10,.05);margin-bottom:12px}
+.ccc-rv-top{display:flex;align-items:center;gap:8px}
+.ccc-rv-top svg{width:20px;height:20px;display:block;flex:none}
+.ccc-rv-top span{font-size:14px;font-weight:600;color:#3c4043;letter-spacing:.01em}
+.ccc-rv-rating{display:flex;align-items:center;gap:9px}
+.ccc-rv-score{font-size:19px;font-weight:800;letter-spacing:-.02em;color:#0a0a0a;line-height:1}
+.ccc-rv-stars{display:flex;align-items:center;gap:2px}
+.ccc-rv-stars svg{width:18px;height:18px;display:block}
+.ccc-rv-count{font-size:12.5px;color:#70757a}
+.ccc-rv-count strong{color:#0a0a0a;font-weight:600}
+.ccc-rv-badge{display:inline-flex;align-items:center;gap:5px;margin-top:2px;font-size:11px;font-weight:600;color:#1a8a55}
+.ccc-rv-badge svg{width:13px;height:13px;display:block;flex:none}
+.ccc-trust-row{display:flex;flex-wrap:wrap;align-items:center;justify-content:center;gap:5px 14px;margin-bottom:22px;font-size:12px;color:#555}
+.ccc-trust-row .ti{display:flex;align-items:center;gap:5px;white-space:nowrap}
+.ccc-trust-row .ti svg{width:14px;height:14px;flex:none;display:block}
+.ccc-trust-row .ti strong{color:#0a0a0a;font-weight:600}
+.ccc-trust-row .ti-sep{width:1px;height:12px;background:#e2e2e2}
 .ccc-scarce{display:flex;align-items:center;justify-content:center;gap:9px;margin:0 0 18px;padding:11px 14px;border:1px solid #f4c9c9;background:#fdecec;border-radius:11px;color:#c62828;font-size:13px;font-weight:600;line-height:1.3;text-align:center}
 .ccc-scarce .ccc-dot{width:9px;height:9px;border-radius:50%;background:#e23b3b;flex:none;box-shadow:0 0 0 0 rgba(226,59,59,.5);animation:cccpulse 1.7s ease-in-out infinite}
 .ccc-scarce .ccc-n{font-weight:800}
@@ -137,7 +150,7 @@ const CSS = `
 .ccc-foot svg{width:13px;height:13px;flex:none;display:block}
 @media (min-width:560px){.ccc-estimate{padding:24px 22px 30px}.ccc-cards{grid-template-columns:1fr 1fr;gap:16px;align-items:stretch}.ccc-cta-wrap{margin-top:auto}.ccc-head h1{font-size:25px}}
 @media (max-width:430px){.ccc-estimate{padding:18px 14px 26px}.ccc-card{padding:18px 16px 16px}.ccc-more,.ccc-git{padding:14px 14px 15px}.ccc-note{padding:12px 13px}.ccc-scarce{padding:10px 12px;font-size:12.5px}}
-@media (max-width:400px){.ccc-trust{gap:5px 12px;padding:10px 12px}.ccc-trust .ccc-t-sep{display:none}.ccc-head h1{font-size:21px}.ccc-price .ccc-amt{font-size:24px}}
+@media (max-width:400px){.ccc-trust-row{gap:4px 10px}.ccc-trust-row .ti-sep{display:none}.ccc-head h1{font-size:21px}.ccc-price .ccc-amt{font-size:24px}}
 `;
 
 /** Split "$355 + GST" / "from $637.50 + GST" / "price on request" into amount + gst. */
@@ -230,14 +243,21 @@ export function buildQuoteHtml(
 
   return `<div class="ccc-estimate"><style>${CSS}</style>
   <p class="sr-only">Your detailing estimate for the ${esc(vehicle)}, with package options and booking links.</p>
-  <div class="ccc-trust" role="group" aria-label="Trust signals">
-    <span class="ccc-t-item"><span class="ccc-stars" aria-hidden="true">${IC.star}${IC.star}${IC.star}${IC.star}${IC.star}</span><span><span class="ccc-t-strong">230+</span> Google reviews</span></span>
-    <span class="ccc-t-sep" aria-hidden="true"></span>
-    <span class="ccc-t-item">${IC.shield} Licensed &amp; insured</span>
-    <span class="ccc-t-sep" aria-hidden="true"></span>
-    <span class="ccc-t-item">${IC.clock}<span><span class="ccc-t-strong">13 yrs</span> in business</span></span>
-    <span class="ccc-t-sep" aria-hidden="true"></span>
-    <span class="ccc-t-item">${IC.guarantee} Money-back guarantee</span>
+  <div class="ccc-reviews" role="group" aria-label="Google reviews">
+    <div class="ccc-rv-top">${IC.googleG}<span>Google Reviews</span></div>
+    <div class="ccc-rv-rating">
+      <span class="ccc-rv-score">5.0</span>
+      <span class="ccc-rv-stars" aria-hidden="true">${IC.gStar}${IC.gStar}${IC.gStar}${IC.gStar}${IC.gStar}</span>
+    </div>
+    <div class="ccc-rv-count">Based on <strong>238 reviews</strong></div>
+    <div class="ccc-rv-badge">${IC.verified} Verified reviews</div>
+  </div>
+  <div class="ccc-trust-row">
+    <span class="ti">${IC.shield} Licensed &amp; insured</span>
+    <span class="ti-sep" aria-hidden="true"></span>
+    <span class="ti">${IC.clock} <strong>13 yrs</strong> in business</span>
+    <span class="ti-sep" aria-hidden="true"></span>
+    <span class="ti">${IC.guarantee} Money-back guarantee</span>
   </div>
   <div class="ccc-head">
     <span class="ccc-eyebrow">${IC.car} Your estimate</span>
