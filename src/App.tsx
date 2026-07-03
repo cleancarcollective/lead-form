@@ -428,10 +428,28 @@ export default function App() {
           <button
             type="submit"
             disabled={isSubmitting}
-            style={{ ...s.button, ...(isSubmitting ? s.buttonDisabled : {}) }}
+            style={{ ...s.button, ...(isSubmitting ? s.buttonSubmitting : {}) }}
           >
-            {isSubmitting ? "Sending…" : "Get Free Estimate!"}
+            {isSubmitting ? (
+              <span style={{ display: "inline-flex", alignItems: "center", gap: "9px" }}>
+                <svg width="16" height="16" viewBox="0 0 24 24" aria-hidden="true">
+                  <circle cx="12" cy="12" r="9" fill="none" stroke="rgba(255,255,255,0.3)" strokeWidth="3" />
+                  <path d="M12 3a9 9 0 0 1 9 9" fill="none" stroke="#fff" strokeWidth="3" strokeLinecap="round">
+                    <animateTransform attributeName="transform" type="rotate" from="0 12 12" to="360 12 12" dur="0.8s" repeatCount="indefinite" />
+                  </path>
+                </svg>
+                Building your custom quote…
+              </span>
+            ) : (
+              "Get Free Estimate!"
+            )}
           </button>
+
+          {isSubmitting && (
+            <p style={s.submitHint}>
+              Pricing your vehicle now. This only takes a few seconds, please don&rsquo;t close the page.
+            </p>
+          )}
 
         </form>
       </div>
@@ -625,6 +643,18 @@ const s: Record<string, React.CSSProperties> = {
   buttonDisabled: {
     opacity: 0.5,
     cursor: "not-allowed",
+  },
+  // Submitting: stay full-strength (it's actively working, not disabled) so
+  // the wait reads as progress, not a dead/faded button.
+  buttonSubmitting: {
+    cursor: "wait",
+    opacity: 1,
+  },
+  submitHint: {
+    margin: "10px 0 0",
+    fontSize: "13px",
+    color: "#666666",
+    lineHeight: 1.45,
   },
   quoteIntro: {
     margin: "-12px 0 20px",
