@@ -57,9 +57,9 @@ const IC = {
 
 const CSS = `
 .ccc-estimate *{box-sizing:border-box;margin:0;padding:0}
-.ccc-estimate{font-family:'Inter',-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,Helvetica,Arial,sans-serif;color:#0a0a0a;background:#ffffff;line-height:1.5;-webkit-font-smoothing:antialiased;text-rendering:optimizeLegibility;max-width:640px;margin:0 auto;padding:20px 18px 28px}
+.ccc-estimate{font-family:'Inter',-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,Helvetica,Arial,sans-serif;color:#0a0a0a;background:linear-gradient(180deg,#f3f2f0 0%,#e9e7e3 100%);line-height:1.5;-webkit-font-smoothing:antialiased;text-rendering:optimizeLegibility;max-width:640px;margin:0 auto;padding:20px 18px 28px}
 .ccc-estimate .sr-only{position:absolute;width:1px;height:1px;padding:0;margin:-1px;overflow:hidden;clip:rect(0,0,0,0);border:0}
-.ccc-reviews{display:flex;flex-direction:column;align-items:center;text-align:center;gap:7px;border:1px solid #e6e6e6;border-radius:14px;padding:17px 18px 15px;background:#fff;box-shadow:0 1px 3px rgba(10,10,10,.05);margin-bottom:12px}
+.ccc-reviews{display:flex;flex-direction:column;align-items:center;text-align:center;gap:7px;border:1px solid #d4d2ce;border-radius:16px;padding:18px 18px 16px;background:linear-gradient(158deg,#ffffff 0%,#f0eeea 52%,#e7e4df 100%);box-shadow:inset 0 1px 0 rgba(255,255,255,.9),0 8px 26px rgba(38,34,28,.13);margin-bottom:14px}
 .ccc-rv-top{display:flex;align-items:center;gap:8px}
 .ccc-rv-top svg{width:20px;height:20px;display:block;flex:none}
 .ccc-rv-top span{font-size:14px;font-weight:600;color:#3c4043;letter-spacing:.01em}
@@ -89,10 +89,10 @@ const CSS = `
 .ccc-emailed{display:flex;align-items:center;gap:7px;margin-top:10px;font-size:13.5px;color:#555}
 .ccc-emailed svg{flex:none;width:15px;height:15px;display:block;color:#0a0a0a}
 .ccc-cards{display:grid;grid-template-columns:1fr;gap:16px}
-.ccc-card{position:relative;border:1px solid #e2e2e2;border-radius:16px;background:#fff;padding:20px 18px 18px;display:flex;flex-direction:column;transition:transform .14s ease,box-shadow .14s ease,border-color .14s ease}
-.ccc-card--std:hover{border-color:#0a0a0a;transform:translateY(-2px);box-shadow:0 8px 24px rgba(10,10,10,.10)}
-.ccc-card--feat{border:1.5px solid #0a0a0a;box-shadow:0 4px 20px rgba(10,10,10,.09)}
-.ccc-card--feat:hover{transform:translateY(-2px);box-shadow:0 10px 30px rgba(10,10,10,.16)}
+.ccc-card{position:relative;border:1px solid #e0ded9;border-radius:16px;background:#fff;padding:20px 18px 18px;display:flex;flex-direction:column;box-shadow:0 2px 10px rgba(30,26,20,.06);transition:transform .14s ease,box-shadow .14s ease,border-color .14s ease}
+.ccc-card--std:hover{border-color:#0a0a0a;transform:translateY(-3px);box-shadow:0 12px 30px rgba(30,26,20,.14)}
+.ccc-card--feat{border:1.5px solid #0a0a0a;box-shadow:0 8px 28px rgba(20,18,15,.16)}
+.ccc-card--feat:hover{transform:translateY(-3px);box-shadow:0 14px 38px rgba(20,18,15,.22)}
 .ccc-badge{position:absolute;top:-11px;left:18px;display:inline-flex;align-items:center;gap:5px;background:#0a0a0a;color:#fff;font-size:11px;font-weight:600;letter-spacing:.04em;padding:5px 11px;border-radius:999px;text-transform:uppercase}
 .ccc-badge svg{width:12px;height:12px;display:block;color:#ffce4f}
 .ccc-card-top{display:flex;justify-content:space-between;align-items:flex-start;gap:12px}
@@ -104,7 +104,7 @@ const CSS = `
 .ccc-price .ccc-gst{font-size:11.5px;color:#888;margin-top:4px;font-weight:500}
 .ccc-anchor{margin-top:10px;font-size:12px;color:#7a7a7a}
 .ccc-anchor .ccc-up{color:#0a0a0a;font-weight:600}
-.ccc-rule{height:1px;background:#eee;margin:15px 0 13px}
+.ccc-rule{height:1px;background:#e8e5e0;margin:15px 0 13px}
 .ccc-inc-label{font-size:11px;font-weight:600;letter-spacing:.06em;text-transform:uppercase;color:#8a8a8a;margin-bottom:9px}
 .ccc-inc{list-style:none;display:grid;gap:8px}
 .ccc-inc li{display:flex;align-items:flex-start;gap:9px;font-size:13.5px;color:#2a2a2a;line-height:1.4}
@@ -120,12 +120,12 @@ const CSS = `
 .ccc-subcta{display:flex;align-items:center;justify-content:center;gap:6px;margin-top:9px;font-size:11.5px;color:#8a8a8a;text-align:center}
 .ccc-subcta svg{width:13px;height:13px;flex:none;display:block}
 .ccc-notes{margin-top:22px;display:grid;gap:10px}
-.ccc-note{display:flex;align-items:flex-start;gap:10px;padding:13px 15px;border:1px solid #ececec;border-radius:12px;background:#fbfbfb;font-size:13px;color:#444;line-height:1.45}
+.ccc-note{display:flex;align-items:flex-start;gap:10px;padding:13px 15px;border:1px solid #e4e2dd;border-radius:12px;background:#fff;box-shadow:0 1px 4px rgba(30,26,20,.05);font-size:13px;color:#444;line-height:1.45}
 .ccc-note svg{flex:none;width:17px;height:17px;margin-top:1px;display:block;color:#0a0a0a}
 .ccc-note strong{font-weight:600;color:#0a0a0a}
 
 /* "want something else?" add-on shortcuts (deep-link the booking page) */
-.ccc-more{margin-top:10px;padding:15px 16px 16px;border:1px solid #ececec;border-radius:12px;background:#fbfbfb}
+.ccc-more{margin-top:10px;padding:15px 16px 16px;border:1px solid #e4e2dd;border-radius:12px;background:#fff;box-shadow:0 1px 4px rgba(30,26,20,.05)}
 .ccc-more-label{display:flex;align-items:center;gap:8px;font-size:12.5px;font-weight:600;color:#0a0a0a;margin-bottom:11px}
 .ccc-more-label svg{width:16px;height:16px;flex:none;display:block;color:#0a0a0a}
 .ccc-more-btns{display:grid;grid-template-columns:1fr 1fr;gap:9px}
@@ -136,7 +136,7 @@ const CSS = `
 .ccc-chip:active{transform:translateY(0) scale(.99)}
 
 /* "need something else?" get-in-touch block */
-.ccc-git{margin-top:10px;padding:15px 16px 16px;border:1px solid #ececec;border-radius:12px;background:#fbfbfb}
+.ccc-git{margin-top:10px;padding:15px 16px 16px;border:1px solid #e4e2dd;border-radius:12px;background:#fff;box-shadow:0 1px 4px rgba(30,26,20,.05)}
 .ccc-git-lead{font-size:13px;color:#444;line-height:1.45;margin-bottom:12px}
 .ccc-git-lead strong{color:#0a0a0a;font-weight:600}
 .ccc-git-btns{display:grid;grid-template-columns:1fr 1fr;gap:9px}
@@ -257,7 +257,7 @@ export function buildQuoteHtml(
   <div class="ccc-trust-row">
     <span class="ti">${IC.shield} Licensed &amp; insured</span>
     <span class="ti-sep" aria-hidden="true"></span>
-    <span class="ti">${IC.clock} <strong>13 yrs</strong> in business</span>
+    <span class="ti">${IC.clock} <strong>13 years</strong> in business</span>
     <span class="ti-sep" aria-hidden="true"></span>
     <span class="ti">${IC.guarantee} Money-back guarantee</span>
   </div>
