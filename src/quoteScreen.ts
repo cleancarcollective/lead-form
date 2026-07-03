@@ -18,6 +18,8 @@ export type Quote = {
   template_key: string;
   size: string | null;
   booking_vehicle_type: string | null;
+  /** Short-lived token to prefill the booking form (contact + vehicle). */
+  prefill_token?: string | null;
   packages: QuotePackage[];
 };
 

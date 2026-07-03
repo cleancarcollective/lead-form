@@ -299,6 +299,8 @@ export default function App() {
       params.set("service", serviceId);
       if (quote?.booking_vehicle_type) params.set("vehicle", quote.booking_vehicle_type);
       params.set("src", "quote");
+      // Opaque token → booking form prefills contact + vehicle server-side.
+      if (quote?.prefill_token) params.set("pf", quote.prefill_token);
       navigateTop(`${BOOKING_URL}?${params.toString()}`);
       return;
     }
