@@ -271,7 +271,7 @@ export function buildQuoteHtml(
       <span class="ccc-rv-score">5.0</span>
       <span class="ccc-rv-stars" aria-hidden="true">${IC.gStar}${IC.gStar}${IC.gStar}${IC.gStar}${IC.gStar}</span>
     </div>
-    <div class="ccc-rv-count">Based on <strong>238 reviews</strong></div>
+    <div class="ccc-rv-count">Based on <strong>230+ reviews</strong></div>
     <div class="ccc-rv-badge">${IC.verified} Verified reviews</div>
   </div>
   <div class="ccc-trust-row">
