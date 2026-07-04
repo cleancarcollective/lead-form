@@ -9,6 +9,9 @@ export type QuotePackage = {
   name: string;
   price: number | null;
   price_label: string;
+  /** Pre-discount sticker label when an ad promo applied (e.g. "$650 + GST"),
+   *  shown struck-through next to the discounted price. */
+  original_price_label?: string | null;
   duration: string;
   highlights: string[];
   booking_service_id: string;
@@ -22,6 +25,8 @@ export type Quote = {
   prefill_token?: string | null;
   /** Ad-promo discount code (e.g. "CCC10") to pre-apply in the booking app. */
   promo_code?: string | null;
+  /** Percent off applied by the ad promo (e.g. 10), for the banner copy. */
+  promo_percent_off?: number | null;
   packages: QuotePackage[];
 };
 
@@ -203,6 +208,7 @@ function renderCard(pkg: QuotePackage, featured: boolean, anchorDiff: number | n
           <div class="ccc-time">${IC.clockSm}${esc(pkg.duration)}</div>
         </div>
         <div class="ccc-price">
+          ${pkg.original_price_label ? `<div class="ccc-was" style="font-size:14px;color:#9ca3af;text-decoration:line-through;font-weight:600;line-height:1;margin-bottom:3px;">${esc(splitPrice(pkg.original_price_label).amt)}</div>` : ""}
           <div class="ccc-amt">${esc(amt)}</div>
           ${gst ? `<div class="ccc-gst">${gst}</div>` : ""}
         </div>
@@ -247,6 +253,16 @@ export function buildQuoteHtml(
   const slotsLeft = [4, 5, 4, 3, 2, 2, 3][new Date().getDay()] ?? 3;
   const scarcity = `<div class="ccc-scarce"><span class="ccc-dot"></span>Only <span class="ccc-n">${slotsLeft}</span> booking${slotsLeft === 1 ? "" : "s"} left this week</div>`;
 
+  // Ad-promo banner: prices below are already discounted, so make it explicit
+  // that the code is applied (customers came from a "10% off" ad).
+  const pctOff = quote.promo_percent_off ?? 10;
+  const promoBanner = quote.promo_code
+    ? `<div class="ccc-promo" style="display:flex;align-items:center;justify-content:center;gap:8px;margin:2px 0 14px;padding:11px 14px;background:#ecfdf5;border:1px solid #6ee7b7;border-radius:12px;color:#047857;font-weight:700;font-size:14px;text-align:center;line-height:1.35;">
+        <span aria-hidden="true" style="font-size:15px;">✓</span>
+        <span>${pctOff}% OFF applied &middot; code <strong>${esc(quote.promo_code)}</strong> &mdash; prices below already include your discount</span>
+      </div>`
+    : "";
+
   return `<div class="ccc-estimate"><style>${CSS}</style>
   <p class="sr-only">Your detailing estimate for the ${esc(vehicle)}, with package options and booking links.</p>
   <div class="ccc-reviews" role="group" aria-label="Google reviews">
@@ -270,6 +286,7 @@ export function buildQuoteHtml(
     <h1>Here’s your estimate for the<br><span class="ccc-veh">${esc(vehicle)}</span></h1>
     <p class="ccc-emailed">${IC.mail} A copy is on its way to your inbox, and you can book right here.</p>
   </div>
+  ${promoBanner}
   ${scarcity}
   <div class="ccc-cards">${cards}</div>
   <div class="ccc-notes">
