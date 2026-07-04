@@ -539,18 +539,25 @@ const pb: Record<string, React.CSSProperties> = {
 const s: Record<string, React.CSSProperties> = {
   page: {
     minHeight: "100vh",
-    backgroundColor: "#000000",
+    // Match the instant-quote result screen: platinum gradient + Inter, so the
+    // form → quote transition is one cohesive surface (was a black page).
+    background: "linear-gradient(180deg,#f3f2f0 0%,#e9e7e3 100%)",
     display: "flex",
     alignItems: "flex-start",
     justifyContent: "center",
-    padding: "0",
-    fontFamily: "-apple-system, BlinkMacSystemFont, 'Segoe UI', Helvetica, Arial, sans-serif",
+    padding: "20px 18px 28px",
+    fontFamily: "'Inter',-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,Helvetica,Arial,sans-serif",
     WebkitFontSmoothing: "antialiased",
   },
   card: {
     width: "100%",
+    maxWidth: "640px",
+    margin: "0 auto",
     backgroundColor: "#ffffff",
-    padding: "32px 24px 40px",
+    border: "1px solid #e0ded9",
+    borderRadius: "16px",
+    boxShadow: "0 2px 10px rgba(30,26,20,.06)",
+    padding: "28px 22px 30px",
     boxSizing: "border-box",
   },
   title: {
@@ -558,7 +565,7 @@ const s: Record<string, React.CSSProperties> = {
     fontSize: "26px",
     fontWeight: 700,
     color: "#0a0a0a",
-    letterSpacing: "-0.01em",
+    letterSpacing: "-0.02em",
   },
   form: {
     display: "flex",
@@ -580,8 +587,8 @@ const s: Record<string, React.CSSProperties> = {
     fontSize: "15px",
     color: "#0a0a0a",
     backgroundColor: "#ffffff",
-    border: "1.5px solid #d0d0d0",
-    borderRadius: "6px",
+    border: "1.5px solid #e0ded9",
+    borderRadius: "10px",
     outline: "none",
     boxSizing: "border-box",
     fontFamily: "inherit",
@@ -597,8 +604,8 @@ const s: Record<string, React.CSSProperties> = {
     fontSize: "15px",
     color: "#0a0a0a",
     backgroundColor: "#ffffff",
-    border: "1.5px solid #d0d0d0",
-    borderRadius: "6px",
+    border: "1.5px solid #e0ded9",
+    borderRadius: "10px",
     outline: "none",
     boxSizing: "border-box",
     fontFamily: "inherit",
@@ -616,7 +623,7 @@ const s: Record<string, React.CSSProperties> = {
     lineHeight: 1,
   },
   divider: {
-    borderTop: "1.5px solid #0a0a0a",
+    borderTop: "1px solid #e8e5e0",
     margin: "4px 0",
   },
   hint: {
@@ -637,7 +644,7 @@ const s: Record<string, React.CSSProperties> = {
     color: "#ffffff",
     backgroundColor: "#0a0a0a",
     border: "none",
-    borderRadius: "6px",
+    borderRadius: "12px",
     cursor: "pointer",
     fontFamily: "inherit",
     marginTop: "4px",
@@ -670,7 +677,7 @@ const s: Record<string, React.CSSProperties> = {
     gap: "14px",
   },
   quoteCard: {
-    border: "1.5px solid #d0d0d0",
+    border: "1.5px solid #e0ded9",
     borderRadius: "8px",
     padding: "16px",
     display: "flex",
