@@ -220,6 +220,17 @@ export default function App() {
 
       if (!response.ok) throw new Error("Submission failed. Please try again.");
 
+      // Conversion signal to the host WP page. The instant quote removed the
+      // thank-you redirect the Meta pixel relied on, so submissions became
+      // invisible to ad platforms. The host page listens for this message and
+      // fires fbq('track','Lead') / dataLayer. Fired for BOTH outcomes (quote
+      // shown and escalated redirect). No PII crosses the frame boundary.
+      try {
+        window.parent.postMessage({ type: "ccc_lead_submitted", shop: SHOP_SLUG }, "*");
+      } catch {
+        /* non-fatal */
+      }
+
       // Instant on-page quote: when the CRM's auto-send gate passes it
       // returns the same packages+prices the estimate email contains.
       // Any escalated lead (notes needing a human, unknown vehicle size)

@@ -259,7 +259,7 @@ export function buildQuoteHtml(
   const promoBanner = quote.promo_code
     ? `<div class="ccc-promo" style="display:flex;align-items:center;justify-content:center;gap:8px;margin:2px 0 14px;padding:11px 14px;background:#ecfdf5;border:1px solid #6ee7b7;border-radius:12px;color:#047857;font-weight:700;font-size:14px;text-align:center;line-height:1.35;">
         <span aria-hidden="true" style="font-size:15px;">✓</span>
-        <span>${pctOff}% OFF applied &middot; code <strong>${esc(quote.promo_code)}</strong> &mdash; prices below already include your discount</span>
+        <span>${pctOff}% OFF applied &middot; code <strong>${esc(quote.promo_code)}</strong> &mdash; prices below already include your discount. Code valid for 7 days.</span>
       </div>`
     : "";
 
