@@ -155,7 +155,9 @@ type FormState = {
   full_name: string;
   email: string;
   phone: string;
-  vehicle: string;
+  vehicle_year: string;
+  vehicle_make: string;
+  vehicle_model: string;
   service_requested: string;
   notes: string;
 };
@@ -164,7 +166,9 @@ const EMPTY: FormState = {
   full_name: "",
   email: "",
   phone: "",
-  vehicle: "",
+  vehicle_year: "",
+  vehicle_make: "",
+  vehicle_model: "",
   service_requested: "",
   notes: "",
 };
@@ -200,6 +204,12 @@ export default function App() {
     const first_name = nameParts[0] ?? form.full_name;
     const last_name = nameParts.slice(1).join(" ") || undefined;
 
+    // Display label for the quote headline (year optional).
+    const vehicleLabel = [form.vehicle_year, form.vehicle_make, form.vehicle_model]
+      .map((v) => v.trim())
+      .filter(Boolean)
+      .join(" ");
+
     try {
       const response = await fetch(CRM_LEAD_URL, {
         method: "POST",
@@ -209,7 +219,9 @@ export default function App() {
           last_name,
           email: form.email,
           phone: form.phone || undefined,
-          vehicle_make: form.vehicle || undefined,
+          vehicle_year: form.vehicle_year.trim() || undefined,
+          vehicle_make: form.vehicle_make.trim() || undefined,
+          vehicle_model: form.vehicle_model.trim() || undefined,
           service_requested: form.service_requested || undefined,
           notes: form.notes || undefined,
           shop_slug: SHOP_SLUG,
@@ -243,9 +255,9 @@ export default function App() {
         if (data?.quote?.packages?.length) {
           const q = data.quote as Quote;
           setQuote(q);
-          setQuoteVehicle(form.vehicle);
+          setQuoteVehicle(vehicleLabel);
           setStatus("quote");
-          saveQuote(q, newLeadId, form.vehicle);
+          saveQuote(q, newLeadId, vehicleLabel);
           sendQuoteEvent(newLeadId, "quote_view", {
             template_key: q.template_key,
             packages: q.packages.length,
@@ -330,7 +342,13 @@ export default function App() {
   const isSubmitting = status === "submitting";
 
   if (status === "quote" && quote) {
-    const vehicleText = IS_PREVIEW ? PREVIEW_VEHICLE : quoteVehicle || form.vehicle;
+    const vehicleText = IS_PREVIEW
+      ? PREVIEW_VEHICLE
+      : quoteVehicle ||
+        [form.vehicle_year, form.vehicle_make, form.vehicle_model]
+          .map((v) => v.trim())
+          .filter(Boolean)
+          .join(" ");
     return (
       <>
         {IS_PREVIEW && <PreviewBar current={PREVIEW_KEY!} />}
@@ -410,18 +428,42 @@ export default function App() {
             </div>
           </Field>
 
-          <p style={s.hint}>Vehicle (e.g. 2018 Mazda CX-5, 2012 BMW 125i)</p>
+          <p style={s.hint}>Your vehicle (e.g. 2018 Mazda CX-5)</p>
 
-          <Field label="Vehicle Year/Make/Model" required>
-            <input
-              name="vehicle"
-              type="text"
-              required
-              placeholder=""
-              value={form.vehicle}
-              onChange={handleChange}
-              style={s.input}
-            />
+          <Field label="Vehicle" required>
+            <div style={{ display: "grid", gridTemplateColumns: "88px 1fr 1fr", gap: "10px" }}>
+              <input
+                name="vehicle_year"
+                type="text"
+                inputMode="numeric"
+                maxLength={4}
+                placeholder="Year"
+                value={form.vehicle_year}
+                onChange={handleChange}
+                style={s.input}
+                aria-label="Vehicle year (optional)"
+              />
+              <input
+                name="vehicle_make"
+                type="text"
+                required
+                placeholder="Make *"
+                value={form.vehicle_make}
+                onChange={handleChange}
+                style={s.input}
+                aria-label="Vehicle make"
+              />
+              <input
+                name="vehicle_model"
+                type="text"
+                required
+                placeholder="Model *"
+                value={form.vehicle_model}
+                onChange={handleChange}
+                style={s.input}
+                aria-label="Vehicle model"
+              />
+            </div>
           </Field>
 
           <Field label="Any additional information?">
