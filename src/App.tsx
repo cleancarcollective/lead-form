@@ -13,6 +13,11 @@ const urlParams =
 const SHOP_SLUG =
   urlParams.get("shop") || import.meta.env.VITE_SHOP_SLUG || "christchurch";
 
+// Mirrors the CRM's QUOTE_ENABLED_SHOP_SLUGS: only Wellington still shows the
+// instant on-page quote. Other shops submit -> thank-you redirect + email, so
+// their submitting-state copy must not promise an on-screen quote.
+const INSTANT_QUOTE = SHOP_SLUG === "wellington";
+
 // Google Ads attribution. The host page (cleancarcollective.co.nz) captures
 // gclid/gbraid/wbraid into a cookie when an ad sends the user to the site.
 // That cookie isn't visible from this iframe (different origin), so the host
@@ -493,7 +498,7 @@ export default function App() {
                     <animateTransform attributeName="transform" type="rotate" from="0 12 12" to="360 12 12" dur="0.8s" repeatCount="indefinite" />
                   </path>
                 </svg>
-                Building your custom quote…
+                {INSTANT_QUOTE ? "Building your custom quote…" : "Sending your details…"}
               </span>
             ) : (
               "Get Free Estimate!"
@@ -502,7 +507,9 @@ export default function App() {
 
           {isSubmitting && (
             <p style={s.submitHint}>
-              Pricing your vehicle now. This only takes a few seconds, please don&rsquo;t close the page.
+              {INSTANT_QUOTE
+                ? "Pricing your vehicle now. This only takes a few seconds, please don’t close the page."
+                : "Sending now. Your estimate will be in your inbox within a couple of minutes."}
             </p>
           )}
 
