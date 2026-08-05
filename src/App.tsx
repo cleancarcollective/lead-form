@@ -498,18 +498,16 @@ export default function App() {
                     <animateTransform attributeName="transform" type="rotate" from="0 12 12" to="360 12 12" dur="0.8s" repeatCount="indefinite" />
                   </path>
                 </svg>
-                {INSTANT_QUOTE ? "Building your custom quote…" : "Sending your details…"}
+                {INSTANT_QUOTE ? "Building your custom quote…" : "Submitting"}
               </span>
             ) : (
               "Get Free Estimate!"
             )}
           </button>
 
-          {isSubmitting && (
+          {isSubmitting && INSTANT_QUOTE && (
             <p style={s.submitHint}>
-              {INSTANT_QUOTE
-                ? "Pricing your vehicle now. This only takes a few seconds, please don’t close the page."
-                : "Sending now. Your estimate will be in your inbox within a couple of minutes."}
+              Pricing your vehicle now. This only takes a few seconds, please don&rsquo;t close the page.
             </p>
           )}
 
